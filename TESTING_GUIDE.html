@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Regreports PIMS — Testing Guide</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-size: 14px;
+      color: #1a202c;
+      background: #f7fafc;
+      padding: 40px 20px;
+    }
+
+    .page {
+      max-width: 860px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.10);
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, #1a365d 0%, #2b6cb0 100%);
+      color: #fff;
+      padding: 36px 40px 28px;
+    }
+    .header h1 { font-size: 22px; font-weight: 700; letter-spacing: 0.3px; }
+    .header .sub {
+      font-size: 13px;
+      color: #bee3f8;
+      margin-top: 6px;
+    }
+    .header .meta {
+      display: flex;
+      gap: 24px;
+      margin-top: 16px;
+      font-size: 12px;
+      color: #90cdf4;
+    }
+
+    /* ── Body ── */
+    .body { padding: 36px 40px; }
+
+    /* ── Sections ── */
+    .section { margin-bottom: 36px; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    .section-num {
+      background: #2b6cb0;
+      color: #fff;
+      font-weight: 700;
+      font-size: 13px;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1a365d;
+    }
+
+    /* ── Subsections ── */
+    .subsection { margin: 14px 0 10px; }
+    .subsection-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #2d3748;
+      background: #edf2f7;
+      padding: 5px 10px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+
+    /* ── Checklist items ── */
+    ul.checklist {
+      list-style: none;
+      padding: 0;
+    }
+    ul.checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 5px 6px;
+      border-radius: 4px;
+      line-height: 1.5;
+    }
+    ul.checklist li:hover { background: #f7fafc; }
+    ul.checklist li::before {
+      content: "";
+      width: 16px; height: 16px;
+      border: 2px solid #a0aec0;
+      border-radius: 3px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      background: #fff;
+    }
+    ul.checklist li strong { color: #2b6cb0; }
+    ul.checklist li em { color: #718096; font-style: normal; font-size: 12px; }
+
+    /* indented sub-list */
+    ul.checklist ul.checklist {
+      margin-top: 4px;
+      margin-left: 26px;
+    }
+
+    /* ── Table ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 13px;
+    }
+    th {
+      background: #ebf8ff;
+      color: #1a365d;
+      font-weight: 700;
+      text-align: left;
+      padding: 8px 12px;
+      border: 1px solid #bee3f8;
+    }
+    td {
+      padding: 7px 12px;
+      border: 1px solid #e2e8f0;
+      vertical-align: top;
+    }
+    tr:nth-child(even) td { background: #f7fafc; }
+
+    /* ── Code blocks ── */
+    pre {
+      background: #1a202c;
+      color: #e2e8f0;
+      border-radius: 6px;
+      padding: 16px 20px;
+      font-size: 12px;
+      font-family: "Cascadia Code", "Consolas", monospace;
+      overflow-x: auto;
+      margin: 10px 0;
+      line-height: 1.6;
+    }
+    code {
+      background: #edf2f7;
+      color: #c53030;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 12px;
+      font-family: "Cascadia Code", "Consolas", monospace;
+    }
+    pre code { background: none; color: inherit; padding: 0; }
+
+    /* ── Note / callout ── */
+    .note {
+      background: #fffbeb;
+      border-left: 4px solid #f6ad55;
+      padding: 10px 14px;
+      border-radius: 0 6px 6px 0;
+      font-size: 13px;
+      margin: 10px 0;
+      color: #744210;
+    }
+    .note strong { color: #c05621; }
+
+    /* ── Regression box ── */
+    .regression {
+      background: #fff5f5;
+      border-left: 4px solid #fc8181;
+      padding: 10px 14px;
+      border-radius: 0 6px 6px 0;
+      font-size: 13px;
+      margin: 4px 0;
+      color: #742a2a;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      background: #edf2f7;
+      text-align: center;
+      padding: 18px;
+      font-size: 12px;
+      color: #718096;
+    }
+
+    /* ── Print ── */
+    @media print {
+      body { background: #fff; padding: 0; }
+      .page { box-shadow: none; border-radius: 0; }
+      .section { page-break-inside: avoid; }
+      pre { white-space: pre-wrap; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <h1>Regreports PIMS — Testing Guide</h1>
+    <div class="sub">Pretreatment Information Management System</div>
+    <div class="meta">
+      <span>Version 1.0</span>
+      <span>Work through sections in order — later sections depend on data created earlier</span>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- ── 1. Environment ── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">1</div>
+        <div class="section-title">Environment Check</div>
+      </div>
+      <p style="margin-bottom:10px;color:#4a5568;font-size:13px;">Verify both servers are running before opening the browser.</p>
+      <ul class="checklist">
+        <li>Backend is running — <code>python app.py</code> shows <em>* Running on http://127.0.0.1:5000</em></li>
+        <li>Frontend is running — <code>npm start</code> opened <code>http://localhost:3000</code></li>
+        <li>PostgreSQL is running and <code>regreports_dev</code> database is reachable</li>
+        <li>No red errors in either terminal at startup</li>
+      </ul>
+    </div>
+
+    <!-- ── 2. Branding ── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">2</div>
+        <div class="section-title">Branding — Regreports PIMS</div>
+      </div>
+      <p style="margin-bottom:10px;color:#4a5568;font-size:13px;">Verify the rename is visible everywhere before testing functionality.</p>
+      <ul class="checklist">
+        <li>Browser tab reads <strong>"Regreports PIMS — Pretreatment Information Management System"</strong></li>
+        <li>Login screen heading reads <strong>"Regreports PIMS"</strong></li>
+        <li>Login screen subtitle reads <strong>"Pretreatment Information Management System"</strong></li>
+        <li>Admin dashboard header shows <strong>"Regreports PIMS"</strong></li>
+        <li>IU dashboard header shows <strong>"Regreports PIMS"</strong></li>
+        <li>Coordinator dashboard header shows <strong>"Regreports PIMS"</strong></li>
+        <li>Finance dashboard header shows <strong>"Regreports PIMS"</strong></li>
+        <li>Finance invoice print preview subtitle reads <strong>"Regreports PIMS — Pretreatment Program Billing"</strong></li>
+        <li>Finance invoice footer reads <strong>"Generated by Regreports PIMS · …"</strong></li>
+      </ul>
+    </div>
+
+    <!-- ── 3. Auth ── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">3</div>
+        <div class="section-title">Authentication</div>
+      </div>
+      <ul class="checklist">
+        <li>Enter a <strong>wrong</strong> username/password → error message appears, no redirect</li>
+        <li>Log in as <strong>admin</strong> → lands on Admin dashboard → Sign Out → back to login</li>
+        <li>Log in as <strong>coordinator</strong> → lands on Coordinator dashboard → Sign Out</li>
+        <li>Log in as <strong>IU user</strong> → lands on IU dashboard → Sign Out</li>
+        <li>Log in as <strong>finance</strong> → lands on Finance dashboard → Sign Out</li>
+      </ul>
+    </div>
+
+    <!-- ── 4. Admin ── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">4</div>
+        <div class="section-title">Admin Dashboard</div>
+      </div>
+      <p style="margin-bottom:12px;color:#4a5568;font-size:13px;">Log in as admin for all tests in this section.</p>
+
+      <div class="subsection">
+        <div class="subsection-title">4a — Companies Tab</div>
+        <ul class="checklist">
+          <li>Company list loads on the left side</li>
+          <li>Clicking a company row highlights it and shows the detail panel on the right</li>
+          <li>Detail panel shows name, contact info, status, and linked permits</li>
+          <li><strong>Add New Company</strong> button (below the list) opens the add form</li>
+          <li>Fill in name and contact info → Save → company appears in list</li>
+          <li>Select a company → Edit → change a field → Save → change is reflected</li>
+          <li>Select a company with <em>no permits</em> → <strong>Open Permits</strong> button is disabled</li>
+          <li>Select a company with permits → <strong>Open Permits</strong> is enabled → switches to Permits tab showing only that company's permits</li>
+          <li>Delete a company → <strong>confirmation dialog appears</strong> → Cancel → company still exists</li>
+          <li>Delete again → Confirm → company removed from list</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">4b — Permits Tab</div>
+        <ul class="checklist">
+          <li>All permits load; filter by company works</li>
+          <li>New Permit → fill in dates → Save → permit appears</li>
+          <li>Open a permit → Add Limit → parameter, daily max, monthly avg → Save → row appears</li>
+          <li>Batch Add Limits → add multiple at once → all appear</li>
+          <li>Delete a limit → <strong>confirmation dialog</strong> → Confirm → limit removed</li>
+          <li>Permits expiring within 90 days are visually flagged</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">4c — Samples Tab</div>
+        <ul class="checklist">
+          <li>All submitted samples load; filter by company works</li>
+          <li>Expanding a sample shows its analyte results</li>
+          <li>Add Result to a sample → fill in parameter and value → Save → result appears</li>
+          <li>Delete a sample result → <strong>confirmation dialog</strong> → Confirm → result removed</li>
+          <li>Delete a sample → <strong>confirmation dialog</strong> → Confirm → sample removed</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">4d — Meters Tab</div>
+        <ul class="checklist">
+          <li>Both flow meters (process and sanitary) appear in the meters panel</li>
+          <li>Sanitary meter unit displays as <strong>cu.ft.</strong> — not MG or gallons</li>
+          <li>Process meter unit displays as <strong>MG</strong></li>
+          <li>Add Meter → form saves → new meter appears</li>
+          <li>Edit an existing meter → change a field → Save → change reflected</li>
+          <li>Readings table loads below the meters panel</li>
+          <li>Add Reading → date, start/end, meter, period days → Save → row appears in table</li>
+          <li>Edit a reading (inline) → change meter assignment → Save → meter type updates</li>
+          <li>Delete a reading → <strong>confirmation dialog</strong> → Confirm → row removed</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">4e — Compliance Tab</div>
+        <ul class="checklist">
+          <li>Compliance summary loads without errors</li>
+          <li>Violations list shows company, parameter, sample date, and severity</li>
+          <li>Filtering by company narrows the list</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">4f — Enforcement Tab</div>
+        <ul class="checklist">
+          <li>Pending enforcement actions list loads</li>
+          <li>Approve an action → submit → action moves out of pending</li>
+          <li>Override an action → fill in reason → submit → override recorded</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">4g — Config Tab</div>
+        <ul class="checklist">
+          <li>POTW config loads (BOD/TSS/Color thresholds and rates)</li>
+          <li>Parameters list loads</li>
+          <li>Add Parameter → name and units → Save → appears in list</li>
+          <li>Frequencies list loads</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">4h — Users Tab</div>
+        <ul class="checklist">
+          <li>User list loads</li>
+          <li>Add User → all fields including role → Save → user appears</li>
+          <li>Edit a user → change email → Save → reflected</li>
+          <li>Creating a duplicate username shows an error message (not a silent failure)</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">4i — Audit Log Tab</div>
+        <ul class="checklist">
+          <li>Audit log loads with recent entries</li>
+          <li>Each entry shows timestamp, user, and action description</li>
+          <li>Actions performed in earlier steps appear here</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">4j — Sampling Schedule Tab</div>
+        <ul class="checklist">
+          <li>Schedule loads with upcoming due dates per company and parameter</li>
+          <li>Overdue entries are visually flagged (red or orange)</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">4k — Notification Bell</div>
+        <ul class="checklist">
+          <li>Bell icon appears in the header</li>
+          <li>Clicking it shows overdue/upcoming sample notifications</li>
+          <li>Clicking a notification navigates to the relevant section</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ── 5. IU ── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">5</div>
+        <div class="section-title">IU Dashboard</div>
+      </div>
+      <p style="margin-bottom:12px;color:#4a5568;font-size:13px;">Log in as an IU user linked to a company with an active permit and at least one prior sample.</p>
+
+      <div class="subsection">
+        <div class="subsection-title">5a — Home Tab</div>
+        <ul class="checklist">
+          <li>Welcome heading shows the correct company name</li>
+          <li><strong>Submit New Sample</strong> button is in the top-right area next to the heading</li>
+          <li><strong>Permit Status card</strong> shows permit number, effective dates, and days until expiry
+            <ul class="checklist">
+              <li>Green border if &gt; 90 days remaining</li>
+              <li>Yellow/orange if expiring within 90 days</li>
+              <li>Red border if expired</li>
+            </ul>
+          </li>
+          <li><strong>"X parameters monitored ▼"</strong> toggle expands the My Permit Parameters table</li>
+          <li>Parameters table columns: Parameter, Sample Type, Daily Max, Monthly Avg, Frequency, Notes</li>
+          <li>Clicking the toggle again collapses the table</li>
+          <li><strong>Compliance card</strong> shows overall status (In Compliance / Out of Compliance)</li>
+          <li>Recent violations are listed in plain English — not raw codes</li>
+          <li>Severity chips are color-coded</li>
+          <li><strong>Sampling Schedule card</strong> shows upcoming parameters with actual due dates</li>
+          <li>Overdue items have red or orange styling</li>
+          <li><strong>Recent Submissions card</strong> shows latest samples with date and result count</li>
+          <li>Samples with exceedances show a violation count badge</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">5b — Submit Sample</div>
+        <ul class="checklist">
+          <li>Submit New Sample → fill in date, collection point, and at least one analyte result → Submit</li>
+          <li>Success message appears; sample shows up in Recent Submissions</li>
+          <li>Submit a sample with a value exceeding a permit limit → violation is flagged</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">5c — Schedule Tab</div>
+        <ul class="checklist">
+          <li>Full sampling schedule table loads with due dates</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ── 6. Coordinator ── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">6</div>
+        <div class="section-title">Coordinator Dashboard</div>
+      </div>
+      <p style="margin-bottom:10px;color:#4a5568;font-size:13px;">Log in as coordinator.</p>
+      <ul class="checklist">
+        <li>Dashboard loads without errors; header shows <strong>Regreports PIMS</strong></li>
+        <li>Samples view shows all companies' recent submissions</li>
+        <li>Violations view lists current violations across all IUs</li>
+        <li>Sampling Schedule shows upcoming requirements for all companies</li>
+        <li>Notification bell works</li>
+        <li>Admin-only functions (Companies, Config, Enforcement) are not accessible</li>
+      </ul>
+    </div>
+
+    <!-- ── 7. Finance ── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">7</div>
+        <div class="section-title">Finance Dashboard</div>
+      </div>
+      <p style="margin-bottom:10px;color:#4a5568;font-size:13px;">Log in as finance.</p>
+      <ul class="checklist">
+        <li>Dashboard loads without errors; header shows <strong>Regreports PIMS</strong></li>
+        <li>Surcharge Calculator → select company and reporting period → Calculate → results appear</li>
+        <li>BOD, TSS, and Color charges are shown individually with a total amount due</li>
+        <li>Generate Invoice → print preview opens in a new window</li>
+        <li>Invoice subtitle reads <strong>"Regreports PIMS — Pretreatment Program Billing"</strong></li>
+        <li>Invoice footer reads <strong>"Generated by Regreports PIMS · [date] · …"</strong></li>
+        <li>Browser print dialog opens automatically in the invoice window</li>
+        <li>Surcharge history table shows past calculations</li>
+        <li>Admin-only functions are not accessible</li>
+      </ul>
+    </div>
+
+    <!-- ── 8. Delete Confirmations ── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">8</div>
+        <div class="section-title">Delete Confirmation Dialogs</div>
+      </div>
+      <p style="margin-bottom:10px;color:#4a5568;font-size:13px;">Every destructive action must show a warning before committing. Verify each explicitly.</p>
+      <table>
+        <thead>
+          <tr><th>Action</th><th>Confirmation dialog shown?</th><th>Cancel aborts?</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Delete company</td><td>☐ Yes &nbsp; ☐ No</td><td>☐ Yes &nbsp; ☐ No</td></tr>
+          <tr><td>Delete permit limit</td><td>☐ Yes &nbsp; ☐ No</td><td>☐ Yes &nbsp; ☐ No</td></tr>
+          <tr><td>Delete sample</td><td>☐ Yes &nbsp; ☐ No</td><td>☐ Yes &nbsp; ☐ No</td></tr>
+          <tr><td>Delete sample result</td><td>☐ Yes &nbsp; ☐ No</td><td>☐ Yes &nbsp; ☐ No</td></tr>
+          <tr><td>Delete meter reading</td><td>☐ Yes &nbsp; ☐ No</td><td>☐ Yes &nbsp; ☐ No</td></tr>
+          <tr><td>Delete user</td><td>☐ Yes &nbsp; ☐ No</td><td>☐ Yes &nbsp; ☐ No</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ── 9. Lab Parser ── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">9</div>
+        <div class="section-title">Lab Report Parser (CLI)</div>
+      </div>
+      <p style="margin-bottom:10px;color:#4a5568;font-size:13px;">Requires a lab report PDF. Run from a terminal.</p>
+      <pre><code>cd C:\Projects\lab_report_parsers
+pip install -e .
+
+# Human-readable table
+python -m lab_report_parsers path\to\report.pdf
+
+# JSON output
+python -m lab_report_parsers path\to\report.pdf --format json
+
+# CSV — one row per analyte result
+python -m lab_report_parsers path\to\report.pdf --format csv &gt; out.csv</code></pre>
+      <ul class="checklist" style="margin-top:10px;">
+        <li>Text output shows client name, Job ID, sample ID(s), and analyte table</li>
+        <li><code>lab</code> field in JSON output reads <strong>"Regreports PIMS"</strong></li>
+        <li>Non-detect result (e.g. <code>&lt;5.0</code>) shows <code>non_detect: true</code> and <code>result: 5.0</code></li>
+        <li>CSV has one row per analyte with all expected columns</li>
+        <li>Running against a missing file prints a clear error and exits with code 1</li>
+      </ul>
+    </div>
+
+    <!-- ── 10. Regression ── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">10</div>
+        <div class="section-title">Regression Check</div>
+      </div>
+      <p style="margin-bottom:10px;color:#4a5568;font-size:13px;">These specific issues were fixed during development. Re-verify they have not silently re-broken.</p>
+
+      <div class="regression">
+        <strong>Open Permits button</strong><br>
+        Select a company that has permits → click Open Permits → Permits tab opens showing <em>only that company's permits</em>. Must not show "please select a company first."
+      </div>
+      <div class="regression" style="margin-top:8px;">
+        <strong>Meter reading type correction</strong><br>
+        Edit a reading and change its meter assignment (e.g. process → sanitary) → meter type updates correctly in the table after saving.
+      </div>
+      <div class="regression" style="margin-top:8px;">
+        <strong>Sanitary meter unit</strong><br>
+        Sanitary meter readings display in <strong>cu.ft.</strong> — not MG, not gallons.
+      </div>
+      <div class="regression" style="margin-top:8px;">
+        <strong>Meters tab layout</strong><br>
+        Both the meter list panel and the readings table render on the Meters tab. No blank panels or invisible forms.
+      </div>
+      <div class="regression" style="margin-top:8px;">
+        <strong>Company detail panel</strong><br>
+        Clicking any company in the list always shows the right-side detail panel immediately. No blank screen.
+      </div>
+    </div>
+
+    <!-- ── 11. Browser Console ── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">11</div>
+        <div class="section-title">Browser Console Check</div>
+      </div>
+      <p style="margin-bottom:10px;color:#4a5568;font-size:13px;">Open DevTools (F12) → Console after completing the above steps.</p>
+      <ul class="checklist">
+        <li>No red errors from failed API calls (<code>401</code>, <code>404</code>, <code>500</code>)</li>
+        <li>No React key warnings for list items</li>
+        <li>No unhandled promise rejections</li>
+      </ul>
+      <div class="note" style="margin-top:12px;">
+        <strong>Tip:</strong> If a test fails, check the backend terminal first — Flask prints full stack traces there. The audit log (Admin → Audit Log) confirms whether an action was actually committed to the database. For meter unit issues, verify directly: <code>SELECT id, meter_id, meter_type, unit FROM tbl_flow_meters;</code>
+      </div>
+    </div>
+
+  </div><!-- /body -->
+
+  <div class="footer">
+    Regreports PIMS — Pretreatment Information Management System &nbsp;·&nbsp; Testing Guide v1.0
+  </div>
+
+</div>
+</body>
+</html>
