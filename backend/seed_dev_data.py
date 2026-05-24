@@ -47,17 +47,16 @@ PARAMETERS = [
     dict(id=6,  name="Oil and Grease",            abbreviation="O&G",   conversion_factor=8.34),
     dict(id=7,  name="Plant Flow (Max)",          abbreviation="PFMax", conversion_factor=0.0),
     dict(id=8,  name="Plant Flow (Avg)",          abbreviation="PFAvg", conversion_factor=0.0),
-    # --- placeholders: update names to match actual permit parameters ---
-    dict(id=9,  name="Parameter 9 [TODO]",        abbreviation="P9",    conversion_factor=8.34),
-    dict(id=10, name="Parameter 10 [TODO]",       abbreviation="P10",   conversion_factor=8.34),
-    dict(id=11, name="Parameter 11 [TODO]",       abbreviation="P11",   conversion_factor=8.34),
-    dict(id=12, name="Parameter 12 [TODO]",       abbreviation="P12",   conversion_factor=8.34),
-    dict(id=13, name="Parameter 13 [TODO]",       abbreviation="P13",   conversion_factor=8.34),
-    dict(id=14, name="Parameter 14 [TODO]",       abbreviation="P14",   conversion_factor=8.34),
-    dict(id=15, name="Temperature",               abbreviation="Temp",  conversion_factor=1.0),
-    dict(id=16, name="Parameter 16 [TODO]",       abbreviation="P16",   conversion_factor=8.34),
-    dict(id=18, name="Daily Flow Limit [TODO]",   abbreviation="QD",    conversion_factor=0.0),
-    dict(id=20, name="Monthly Avg Flow [TODO]",   abbreviation="QM",    conversion_factor=0.0),
+    dict(id=9,  name="Ammonia Nitrogen",       abbreviation="NH3-N", conversion_factor=8.34),
+    dict(id=10, name="Copper",                abbreviation="Cu",    conversion_factor=8.34),
+    dict(id=11, name="Zinc",                  abbreviation="Zn",    conversion_factor=8.34),
+    dict(id=12, name="Lead",                  abbreviation="Pb",    conversion_factor=8.34),
+    dict(id=13, name="Chromium Total",        abbreviation="Cr",    conversion_factor=8.34),
+    dict(id=14, name="Nickel",                abbreviation="Ni",    conversion_factor=8.34),
+    dict(id=15, name="Temperature",           abbreviation="Temp",  conversion_factor=1.0),
+    dict(id=16, name="Total Dissolved Solids",abbreviation="TDS",   conversion_factor=8.34),
+    dict(id=18, name="Daily Flow Maximum",    abbreviation="QD",    conversion_factor=0.0),
+    dict(id=20, name="Monthly Average Flow",  abbreviation="QM",    conversion_factor=0.0),
 ]
 
 FREQUENCIES = [
