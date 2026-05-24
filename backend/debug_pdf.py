@@ -14,13 +14,7 @@ if not all_text.strip():
     import os, pytesseract
     from pdf2image import convert_from_path
 
-    tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-    poppler_path  = r"C:\poppler\poppler-24.08.0\Library\bin"
-
-    if os.path.exists(tesseract_cmd):
-        pytesseract.pytesseract.tesseract_cmd = tesseract_cmd
-
-    images = convert_from_path(path, dpi=300, poppler_path=poppler_path)
+    images = convert_from_path(path, dpi=300)
     for i, img in enumerate(images, 1):
         text = pytesseract.image_to_string(img, config="--psm 6")
         print(f"\n{'='*60}\nPAGE {i} (OCR)\n{'='*60}")

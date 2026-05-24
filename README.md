@@ -8,9 +8,9 @@ Flask + PostgreSQL backend · React/TypeScript frontend · DigitalOcean hosting
 ```bash
 cd backend
 python -m venv venv
-venv\Scripts\activate        # Windows
+source venv/bin/activate
 pip install -r requirements.txt
-copy .env.example .env       # then edit DATABASE_URL and SECRET_KEY
+cp .env.example .env         # then edit DATABASE_URL and SECRET_KEY
 python app.py
 ```
 

@@ -21,8 +21,8 @@ try:
 except ImportError:
     raise ImportError("pdfplumber is required: pip install pdfplumber")
 
-_TESSERACT_CMD = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-_POPPLER_PATH  = r"C:\poppler\poppler-24.08.0\Library\bin"
+_TESSERACT_CMD = "/usr/bin/tesseract"
+_POPPLER_PATH  = "/usr/bin"
 
 
 # ---------------------------------------------------------------------------
