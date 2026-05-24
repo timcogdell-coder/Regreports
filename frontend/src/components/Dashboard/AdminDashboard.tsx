@@ -262,7 +262,7 @@ export default function AdminDashboard({ user, onLogout }: Props) {
         expiration_date: p.expiration_date,
       });
       setIsViewingPermit(true);
-      setSelectedPermitLimits([...(p.limits ?? [])].sort((a: any, b: any) => a.parameter_name.localeCompare(b.parameter_name)));
+      setSelectedPermitLimits([...(p.limits ?? [])].sort((a: any, b: any) => (a.parameter_name ?? "").localeCompare(b.parameter_name ?? "")));
     });
   };
 
@@ -326,7 +326,7 @@ export default function AdminDashboard({ user, onLogout }: Props) {
         await addPermitLimit(selectedPermit as number, payload);
       }
       const refreshed = await api.get(`/permits/${selectedPermit}`);
-      setSelectedPermitLimits([...(refreshed.data.limits ?? [])].sort((a: any, b: any) => a.parameter_name.localeCompare(b.parameter_name)));
+      setSelectedPermitLimits([...(refreshed.data.limits ?? [])].sort((a: any, b: any) => (a.parameter_name ?? "").localeCompare(b.parameter_name ?? "")));
       resetLimitForm();
       setEditingLimitId(null);
       setStatus(editingLimitId ? "Permit limit updated." : "Permit limit added.");
@@ -385,7 +385,7 @@ export default function AdminDashboard({ user, onLogout }: Props) {
       const items = limitQueue.map(({ _param_name, ...rest }) => rest);
       await addPermitLimitsBatch(selectedPermit as number, items);
       const refreshed = await api.get(`/permits/${selectedPermit}`);
-      setSelectedPermitLimits([...(refreshed.data.limits ?? [])].sort((a: any, b: any) => a.parameter_name.localeCompare(b.parameter_name)));
+      setSelectedPermitLimits([...(refreshed.data.limits ?? [])].sort((a: any, b: any) => (a.parameter_name ?? "").localeCompare(b.parameter_name ?? "")));
       setLimitQueue([]);
       setStatus(`${items.length} limit${items.length !== 1 ? "s" : ""} added.`);
     } catch (err: any) {
@@ -401,7 +401,7 @@ export default function AdminDashboard({ user, onLogout }: Props) {
     try {
       const res = await deletePermitLimit(selectedPermit as number, limitId);
       const removed = res.data.sample_results_removed;
-      getPermit(selectedPermit as number).then((r: any) => setSelectedPermitLimits([...(r.data.limits ?? [])].sort((a: any, b: any) => a.parameter_name.localeCompare(b.parameter_name))));
+      getPermit(selectedPermit as number).then((r: any) => setSelectedPermitLimits([...(r.data.limits ?? [])].sort((a: any, b: any) => (a.parameter_name ?? "").localeCompare(b.parameter_name ?? ""))));
       setStatus(removed > 0
         ? `Limit deleted — ${removed} sample result(s) also removed.`
         : "Limit deleted.");
@@ -597,7 +597,7 @@ export default function AdminDashboard({ user, onLogout }: Props) {
       );
       const missing = (r.data.limits ?? []).filter(
         (l: any) => !existingIds.has(l.id) && !l.is_flow_limit
-      ).sort((a: any, b: any) => a.parameter_name.localeCompare(b.parameter_name));
+      ).sort((a: any, b: any) => (a.parameter_name ?? "").localeCompare(b.parameter_name ?? ""));
       setAddParamLimits(missing);
       setAddParamLimitId(missing.length > 0 ? String(missing[0].id) : "");
       setAddParamConc("");

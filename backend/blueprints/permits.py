@@ -236,8 +236,15 @@ def add_limits_batch(permit_id):
 @login_required
 @roles_required("admin")
 def update_limit(permit_id, limit_id):
+    from models import EnforcementHistory
     limit = PermitLimit.query.filter_by(id=limit_id, permit_id=permit_id).first_or_404()
     data = request.get_json()
+
+    # Capture thresholds before update so we can detect removals
+    old_daily_max_conc   = limit.daily_max_concentration
+    old_weekly_max_conc  = limit.weekly_max_concentration
+    old_monthly_avg_conc = limit.monthly_avg_concentration
+
     limit.parameter_id              = data.get("parameter_id",              limit.parameter_id)
     limit.daily_max_concentration   = data.get("daily_max_concentration",   limit.daily_max_concentration)
     limit.daily_max_loading         = data.get("daily_max_loading",         limit.daily_max_loading)
@@ -254,6 +261,30 @@ def update_limit(permit_id, limit_id):
     limit.range_unit                = data.get("range_unit",                 limit.range_unit or "s.u.")
     limit.is_flow_limit             = bool(data.get("is_flow_limit",         limit.is_flow_limit or False))
     limit.averaging_period          = data.get("averaging_period",           limit.averaging_period)
+
+    # When a concentration threshold is removed, delete violations that were based on it.
+    # They are stale: the limit no longer exists, so the exceedance is no longer valid.
+    # Any genuine loading-based avg_exceeds will be recreated on the next compliance run.
+    stale_types = set()
+    if old_daily_max_conc  is not None and limit.daily_max_concentration  is None:
+        stale_types.add("max_exceeds")
+    if old_weekly_max_conc is not None and limit.weekly_max_concentration is None:
+        stale_types.add("weekly_avg_exceeds")
+    if old_monthly_avg_conc is not None and limit.monthly_avg_concentration is None:
+        stale_types.add("avg_exceeds")
+
+    if stale_types:
+        stale_viols = Violation.query.filter(
+            Violation.permit_limit_id == limit_id,
+            Violation.violation_type.in_(stale_types),
+        ).all()
+        if stale_viols:
+            vids = [v.id for v in stale_viols]
+            EnforcementHistory.query.filter(
+                EnforcementHistory.violation_id.in_(vids)
+            ).delete(synchronize_session=False)
+            Violation.query.filter(Violation.id.in_(vids)).delete(synchronize_session=False)
+
     param_name = limit.parameter.name if limit.parameter else f"limit {limit_id}"
     audit(
         "Updated permit limit",
