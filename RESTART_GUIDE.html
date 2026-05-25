@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Regreports PIMS – Restart Guide</title>
+  <title>Regreports PIMS – Dev Guide</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -16,7 +16,6 @@
       margin: 0 auto;
     }
 
-    /* ── Header ── */
     .header {
       border-bottom: 3px solid #2b6cb0;
       padding-bottom: 16px;
@@ -34,7 +33,6 @@
       margin-top: 4px;
     }
 
-    /* ── Section headings ── */
     h2 {
       font-size: 15px;
       font-weight: 700;
@@ -52,7 +50,6 @@
       page-break-after: avoid;
     }
 
-    /* ── Step blocks ── */
     .steps { counter-reset: step; margin: 0; padding: 0; list-style: none; }
     .steps li {
       counter-increment: step;
@@ -78,7 +75,6 @@
     }
     .steps li .text { flex: 1; line-height: 1.55; }
 
-    /* ── Code / command blocks ── */
     code {
       font-family: "Consolas", "Courier New", monospace;
       font-size: 12px;
@@ -103,7 +99,6 @@
     pre .comment { color: #68d391; }
     pre .prompt  { color: #90cdf4; }
 
-    /* ── Info / warning / error boxes ── */
     .box {
       border-left: 4px solid;
       padding: 10px 14px;
@@ -115,11 +110,9 @@
     }
     .box.info    { border-color: #3182ce; background: #ebf8ff; color: #1a365d; }
     .box.warn    { border-color: #d69e2e; background: #fffff0; color: #744210; }
-    .box.error   { border-color: #c53030; background: #fff5f5; color: #742a2a; }
     .box.success { border-color: #276749; background: #f0fff4; color: #1c4532; }
     .box strong  { display: block; margin-bottom: 4px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
 
-    /* ── Two-column layout for prerequisites ── */
     .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 12px 0; }
     .prereq-card {
       border: 1px solid #e2e8f0;
@@ -136,7 +129,6 @@
     }
     .prereq-card .value { font-size: 12px; color: #2d3748; }
 
-    /* ── Quick-reference table ── */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -150,7 +142,6 @@
     tbody td { padding: 7px 12px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
     tbody td code { background: transparent; padding: 0; }
 
-    /* ── Footer ── */
     .footer {
       margin-top: 40px;
       padding-top: 14px;
@@ -170,40 +161,35 @@
 </head>
 <body>
 
-  <!-- ════════════════════════════════════════════
-       HEADER
-  ════════════════════════════════════════════ -->
   <div class="header">
-    <h1>Regreports PIMS — Server Restart Guide</h1>
-    <div class="subtitle">How to start or restart the Flask backend and React frontend &nbsp;·&nbsp; Wastewater Surcharge Compliance System</div>
+    <h1>Regreports PIMS — Developer Guide</h1>
+    <div class="subtitle">Starting the backend &amp; frontend · PostgreSQL access · Quick reference &nbsp;·&nbsp; Linux (ThinkPad X1 Carbon)</div>
   </div>
 
 
-  <!-- ════════════════════════════════════════════
+  <!-- ══════════════════════════════════════════════
        OVERVIEW
-  ════════════════════════════════════════════ -->
+  ══════════════════════════════════════════════ -->
   <h2>Overview</h2>
   <p style="line-height:1.7; margin-bottom:10px;">
     Regreports PIMS runs as two separate processes that must <em>both</em> be running for the
-    application to work. The <strong>Flask backend</strong> serves the API and writes to
-    the database. The <strong>React frontend</strong> serves the browser interface.
-    Each requires its own terminal window (PowerShell or Command Prompt).
+    app to work. Each requires its own terminal.
   </p>
 
   <div class="two-col">
     <div class="prereq-card">
       <div class="label">Backend</div>
       <div class="value">
-        <strong>Python 3.10+</strong> with virtual environment<br>
-        Directory: <code>C:\Projects\Regreports PIMS\backend</code><br>
+        Flask (Python 3.12) + PostgreSQL 16<br>
+        Directory: <code>/home/tim/Regreports/backend</code><br>
         Runs on: <code>http://localhost:5000</code>
       </div>
     </div>
     <div class="prereq-card">
       <div class="label">Frontend</div>
       <div class="value">
-        <strong>Node.js 18+</strong> with npm<br>
-        Directory: <code>C:\Projects\Regreports PIMS\frontend</code><br>
+        React + TypeScript (Node.js)<br>
+        Directory: <code>/home/tim/Regreports/frontend</code><br>
         Runs on: <code>http://localhost:3000</code>
       </div>
     </div>
@@ -211,41 +197,35 @@
 
   <div class="box info">
     <strong>Tip</strong>
-    Open two separate PowerShell windows — one for the backend, one for the frontend.
-    Both must stay open while you are using the application. Closing a window stops that process.
+    Open two separate terminal windows — one for the backend, one for the frontend.
+    Both must stay open while using the app. Closing a terminal stops that process.
   </div>
 
 
-  <!-- ════════════════════════════════════════════
+  <!-- ══════════════════════════════════════════════
        BACKEND
-  ════════════════════════════════════════════ -->
+  ══════════════════════════════════════════════ -->
   <h2>1 &nbsp; Starting the Flask Backend</h2>
 
   <ol class="steps">
     <li>
       <div class="text">
-        Open a <strong>new PowerShell window</strong> and navigate to the backend folder.
-        <pre><span class="prompt">PS C:\&gt;</span>  cd C:\Projects\Regreports PIMS\backend</pre>
+        Open a terminal and navigate to the backend folder.
+        <pre><span class="prompt">$</span>  cd /home/tim/Regreports/backend</pre>
       </div>
     </li>
     <li>
       <div class="text">
         Activate the Python virtual environment.
-        <pre><span class="prompt">PS backend&gt;</span>  venv\Scripts\Activate.ps1</pre>
-        The prompt will change to show <code>(venv)</code> at the start — for example
-        <code>(venv) PS C:\Projects\Regreports PIMS\backend&gt;</code>.
-        <div class="box warn" style="margin-top:8px;">
-          <strong>If activation fails (execution policy error)</strong>
-          Run this once in PowerShell as Administrator, then try again:<br>
-          <code>Set-ExecutionPolicy RemoteSigned -Scope CurrentUser</code>
-        </div>
+        <pre><span class="prompt">$</span>  source venv/bin/activate</pre>
+        The prompt will change to show <code>(venv)</code> at the start.
       </div>
     </li>
     <li>
       <div class="text">
         Start the Flask server.
-        <pre><span class="prompt">(venv) PS backend&gt;</span>  python app.py</pre>
-        You should see output similar to:
+        <pre><span class="prompt">(venv) $</span>  python app.py</pre>
+        You should see:
         <pre><span class="comment"> * Running on http://127.0.0.1:5000
  * Debug mode: on
  * Restarting with stat</span></pre>
@@ -255,129 +235,113 @@
 
   <div class="box success">
     <strong>Backend is ready when you see</strong>
-    <code>Running on http://127.0.0.1:5000</code> — leave this window open.
+    <code>Running on http://127.0.0.1:5000</code> — leave this terminal open.
   </div>
 
-  <h3>Stopping the backend</h3>
-  <p style="line-height:1.55;">Press <code>Ctrl + C</code> in the backend PowerShell window. You will see
-  <code>Terminating…</code> and the prompt will return.</p>
+  <h3>One-liner (if you prefer)</h3>
+  <pre><span class="prompt">$</span>  cd /home/tim/Regreports/backend &amp;&amp; source venv/bin/activate &amp;&amp; python app.py</pre>
 
-  <h3>Restarting the backend</h3>
+  <h3>Stopping / restarting</h3>
   <p style="line-height:1.55; margin-bottom:8px;">
-    Stop it with <code>Ctrl + C</code>, then run <code>python app.py</code> again.
-    You do <strong>not</strong> need to re-activate the virtual environment in the same window —
-    it stays active for the lifetime of that PowerShell session.
+    Press <code>Ctrl + C</code> to stop. Run <code>python app.py</code> again to restart —
+    you don't need to re-activate the venv in the same terminal session.
+    Flask in debug mode auto-reloads most code changes, but restart manually after
+    changing <code>app.py</code> or <code>models.py</code>.
   </p>
 
-  <div class="box warn">
-    <strong>Must restart after any Python file change</strong>
-    Flask in debug mode auto-reloads most code changes, but if you add a new blueprint,
-    change <code>app.py</code>, or modify <code>models.py</code>, stop and restart manually.
-  </div>
 
-
-  <!-- ════════════════════════════════════════════
+  <!-- ══════════════════════════════════════════════
        FRONTEND
-  ════════════════════════════════════════════ -->
+  ══════════════════════════════════════════════ -->
   <h2>2 &nbsp; Starting the React Frontend</h2>
 
   <ol class="steps">
     <li>
       <div class="text">
-        Open a <strong>second PowerShell window</strong> (keep the backend window open)
+        Open a <strong>second terminal</strong> (keep the backend terminal open)
         and navigate to the frontend folder.
-        <pre><span class="prompt">PS C:\&gt;</span>  cd C:\Projects\Regreports PIMS\frontend</pre>
+        <pre><span class="prompt">$</span>  cd /home/tim/Regreports/frontend</pre>
       </div>
     </li>
     <li>
       <div class="text">
         Start the development server.
-        <pre><span class="prompt">PS frontend&gt;</span>  npm start</pre>
-        The first start may take 15–30 seconds. When ready, the browser will open
-        automatically at <code>http://localhost:3000</code>.
+        <pre><span class="prompt">$</span>  npm start</pre>
+        The first start may take 15–30 seconds. When ready you'll see
+        <code>Compiled successfully!</code> and the app is available at
+        <code>http://localhost:3000</code>.
       </div>
     </li>
   </ol>
 
   <div class="box success">
     <strong>Frontend is ready when you see</strong>
-    <code>Compiled successfully!</code> and the login page appears in your browser.
+    <code>Compiled successfully!</code> — open <code>http://localhost:3000</code> in the browser.
   </div>
 
-  <h3>Stopping the frontend</h3>
-  <p style="line-height:1.55;">Press <code>Ctrl + C</code> in the frontend PowerShell window and confirm with <code>Y</code> if prompted.</p>
+  <h3>Stopping</h3>
+  <p style="line-height:1.55;">Press <code>Ctrl + C</code> in the frontend terminal.</p>
 
-  <h3>After code changes</h3>
-  <p style="line-height:1.55;">
-    The React dev server watches for file changes and reloads the browser automatically.
-    A manual restart (<code>Ctrl + C</code> then <code>npm start</code>) is rarely needed
-    unless the server itself crashes or a new dependency was installed.
+  <h3>After installing new packages</h3>
+  <p style="line-height:1.55;">Run <code>npm install</code> before <code>npm start</code> if <code>package.json</code> changed.</p>
+
+
+  <!-- ══════════════════════════════════════════════
+       POSTGRESQL
+  ══════════════════════════════════════════════ -->
+  <h2>3 &nbsp; PostgreSQL Access</h2>
+
+  <p style="line-height:1.7; margin-bottom:10px;">
+    The database is <strong>PostgreSQL 16</strong>, running locally on port 5432.
+    Database name: <code>regreports_dev</code>.
+    A <code>tim</code> superuser role exists so you can connect directly from the terminal
+    without a password.
   </p>
 
-  <div class="box warn">
-    <strong>After installing new npm packages</strong>
-    If someone adds a new package to <code>package.json</code>, run
-    <code>npm install</code> before <code>npm start</code>.
-  </div>
+  <h3>Open an interactive psql session</h3>
+  <pre><span class="prompt">$</span>  psql -d regreports_dev</pre>
 
+  <h3>Run a one-off query</h3>
+  <pre><span class="prompt">$</span>  psql -d regreports_dev -c "SELECT * FROM tbl_companies;"</pre>
 
-  <!-- ════════════════════════════════════════════
-       COMMON ERRORS
-  ════════════════════════════════════════════ -->
-  <h2>3 &nbsp; Common Errors &amp; Fixes</h2>
-
+  <h3>Useful psql commands</h3>
   <table>
     <thead>
-      <tr>
-        <th style="width:38%">Error message</th>
-        <th>Cause</th>
-        <th>Fix</th>
-      </tr>
+      <tr><th>Command</th><th>What it does</th></tr>
     </thead>
     <tbody>
-      <tr>
-        <td><code>No module named flask</code></td>
-        <td>Virtual environment not activated</td>
-        <td>Run <code>venv\Scripts\Activate.ps1</code> first</td>
-      </tr>
-      <tr>
-        <td><code>python: command not found</code> or<br><code>python is not recognized</code></td>
-        <td>Running from wrong directory or Python not in PATH</td>
-        <td>Ensure you are in <code>C:\Projects\Regreports PIMS\backend</code> with venv activated</td>
-      </tr>
-      <tr>
-        <td><code>Address already in use</code> (port 5000)</td>
-        <td>A previous backend instance is still running</td>
-        <td>Find and close the other PowerShell window running Flask, or run:<br>
-            <code>netstat -ano | findstr :5000</code> then <code>taskkill /PID &lt;id&gt; /F</code></td>
-      </tr>
-      <tr>
-        <td><code>npm: command not found</code></td>
-        <td>Running from wrong directory, or Node.js not installed</td>
-        <td>Ensure you are in <code>C:\Projects\Regreports PIMS\frontend</code></td>
-      </tr>
-      <tr>
-        <td>Browser shows blank page or login fails</td>
-        <td>Backend not running or wrong URL</td>
-        <td>Check the backend window — restart if it shows an error. Confirm backend is at <code>localhost:5000</code></td>
-      </tr>
-      <tr>
-        <td><code>CORS error</code> in browser console</td>
-        <td>Frontend and backend ports do not match proxy config</td>
-        <td>Confirm backend is on port 5000 and frontend proxy in <code>package.json</code> points to <code>http://localhost:5000</code></td>
-      </tr>
-      <tr>
-        <td>Database changes not appearing</td>
-        <td>Backend was not restarted after a model change</td>
-        <td>Stop and restart Flask; SQLAlchemy runs <code>db.create_all()</code> on startup</td>
-      </tr>
+      <tr><td><code>\dt</code></td><td>List all tables</td></tr>
+      <tr><td><code>\d tbl_companies</code></td><td>Show columns for a table</td></tr>
+      <tr><td><code>\x</code></td><td>Toggle expanded (vertical) row display</td></tr>
+      <tr><td><code>\q</code></td><td>Quit psql</td></tr>
+      <tr><td><code>SELECT * FROM tbl_violations WHERE resolved = false;</code></td><td>Example query</td></tr>
     </tbody>
   </table>
 
+  <div class="box info">
+    <strong>Table naming</strong>
+    All tables use the <code>tbl_</code> prefix — e.g. <code>tbl_companies</code>,
+    <code>tbl_permits</code>, <code>tbl_samples</code>, <code>tbl_violations</code>.
+  </div>
 
-  <!-- ════════════════════════════════════════════
+  <h3>Backend database URL</h3>
+  <p style="line-height:1.55; margin-bottom:8px;">
+    The Flask app connects via the <code>DATABASE_URL</code> in
+    <code>/home/tim/Regreports/backend/.env</code>:
+  </p>
+  <pre>DATABASE_URL=postgresql://postgres:&lt;password&gt;@localhost/regreports_dev</pre>
+
+  <h3>Check PostgreSQL service status</h3>
+  <pre><span class="prompt">$</span>  pg_lsclusters</pre>
+  <p style="line-height:1.55; margin-top:6px;">
+    The <code>16 main</code> cluster should show <code>online</code> on port 5432.
+    If it's not running: <code>sudo systemctl start postgresql</code>
+  </p>
+
+
+  <!-- ══════════════════════════════════════════════
        DEFAULT CREDENTIALS
-  ════════════════════════════════════════════ -->
+  ══════════════════════════════════════════════ -->
   <h2>4 &nbsp; Default Login</h2>
 
   <div class="two-col">
@@ -392,46 +356,78 @@
   </div>
 
   <div class="box warn">
-    <strong>First-time setup only</strong>
-    The admin account is created by the <code>create_admin.py</code> script in the backend folder.
-    If it has already been run once, running it again will report a duplicate-user error — that is safe to ignore.
-    To create the account: activate the venv, then run <code>python create_admin.py</code>.
+    <strong>First-time setup</strong>
+    The admin account is created by running <code>python create_admin.py</code> from the backend
+    folder (with the venv activated). If it's already been run, a duplicate-user message will appear — safe to ignore.
   </div>
 
 
-  <!-- ════════════════════════════════════════════
-       QUICK REFERENCE
-  ════════════════════════════════════════════ -->
-  <h2>5 &nbsp; Quick Reference</h2>
+  <!-- ══════════════════════════════════════════════
+       COMMON ERRORS
+  ══════════════════════════════════════════════ -->
+  <h2>5 &nbsp; Common Errors &amp; Fixes</h2>
 
   <table>
     <thead>
-      <tr><th>Action</th><th>Command</th><th>Window</th></tr>
+      <tr>
+        <th style="width:38%">Error</th>
+        <th>Cause</th>
+        <th>Fix</th>
+      </tr>
     </thead>
     <tbody>
       <tr>
-        <td>Navigate to backend</td>
-        <td><code>cd C:\Projects\Regreports PIMS\backend</code></td>
+        <td><code>No module named flask</code></td>
+        <td>Virtual environment not activated</td>
+        <td>Run <code>source venv/bin/activate</code> first</td>
+      </tr>
+      <tr>
+        <td><code>Address already in use</code> (port 5000)</td>
+        <td>A previous backend instance is still running</td>
+        <td><code>lsof -ti:5000 | xargs kill</code></td>
+      </tr>
+      <tr>
+        <td><code>Address already in use</code> (port 3000)</td>
+        <td>A previous frontend instance is still running</td>
+        <td><code>lsof -ti:3000 | xargs kill</code></td>
+      </tr>
+      <tr>
+        <td>Browser shows blank page or login fails</td>
+        <td>Backend not running</td>
+        <td>Check the backend terminal — restart if it shows an error</td>
+      </tr>
+      <tr>
+        <td><code>psql: FATAL: role "tim" does not exist</code></td>
+        <td><code>tim</code> PostgreSQL role missing</td>
+        <td><code>sudo -u postgres createuser --superuser tim</code></td>
+      </tr>
+      <tr>
+        <td>Database changes not appearing</td>
+        <td>Backend not restarted after a model change</td>
+        <td>Stop and restart Flask; <code>db.create_all()</code> runs on startup</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <!-- ══════════════════════════════════════════════
+       QUICK REFERENCE
+  ══════════════════════════════════════════════ -->
+  <h2>6 &nbsp; Quick Reference</h2>
+
+  <table>
+    <thead>
+      <tr><th>Action</th><th>Command</th><th>Terminal</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Start backend</td>
+        <td><code>cd /home/tim/Regreports/backend &amp;&amp; source venv/bin/activate &amp;&amp; python app.py</code></td>
         <td>Backend</td>
       </tr>
       <tr>
-        <td>Activate virtual environment</td>
-        <td><code>venv\Scripts\Activate.ps1</code></td>
-        <td>Backend</td>
-      </tr>
-      <tr>
-        <td>Start Flask</td>
-        <td><code>python app.py</code></td>
-        <td>Backend</td>
-      </tr>
-      <tr>
-        <td>Navigate to frontend</td>
-        <td><code>cd C:\Projects\Regreports PIMS\frontend</code></td>
-        <td>Frontend</td>
-      </tr>
-      <tr>
-        <td>Start React</td>
-        <td><code>npm start</code></td>
+        <td>Start frontend</td>
+        <td><code>cd /home/tim/Regreports/frontend &amp;&amp; npm start</code></td>
         <td>Frontend</td>
       </tr>
       <tr>
@@ -444,16 +440,33 @@
         <td><code>http://localhost:3000</code></td>
         <td>Browser</td>
       </tr>
+      <tr>
+        <td>Open psql</td>
+        <td><code>psql -d regreports_dev</code></td>
+        <td>Any</td>
+      </tr>
+      <tr>
+        <td>Quick DB query</td>
+        <td><code>psql -d regreports_dev -c "SELECT …"</code></td>
+        <td>Any</td>
+      </tr>
+      <tr>
+        <td>Check PostgreSQL status</td>
+        <td><code>pg_lsclusters</code></td>
+        <td>Any</td>
+      </tr>
+      <tr>
+        <td>Push to GitHub</td>
+        <td><code>git push</code> (PAT stored in remote URL)</td>
+        <td>Any</td>
+      </tr>
     </tbody>
   </table>
 
 
-  <!-- ════════════════════════════════════════════
-       FOOTER
-  ════════════════════════════════════════════ -->
   <div class="footer">
     <span>Regreports PIMS — Wastewater Surcharge Compliance System</span>
-    <span>C:\Projects\Regreports PIMS\RESTART_GUIDE.html</span>
+    <span>/home/tim/Regreports/RESTART_GUIDE.html</span>
   </div>
 
 </body>
