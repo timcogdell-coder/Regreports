@@ -689,6 +689,8 @@ export default function IUDashboard({ user, onLogout, initialTab }: Props) {
                                                (r.min_value != null && conc < r.min_value) ||
                                                (r.max_value != null && conc > r.max_value));
                           const exceedsConc  = !r.is_range_limit && r.daily_max_concentration && hasConc && conc > r.daily_max_concentration;
+                          const exceedsMonthlyAvg = !r.is_range_limit && !r.daily_max_concentration && !r.daily_max_loading &&
+                                                     r.monthly_avg_concentration != null && hasConc && conc > r.monthly_avg_concentration;
                           const exceedsLoad  = (loadingOnly || r.is_range_limit) && r.daily_max_loading && calcLoading !== null && calcLoading > r.daily_max_loading;
                           const unit = isPlantFlow ? "MGD" : r.is_range_limit ? (r.range_unit ?? "s.u.") : "mg/L";
 
@@ -733,7 +735,9 @@ export default function IUDashboard({ user, onLogout, initialTab }: Props) {
                                       ? <strong>{r.daily_max_loading} lbs/day</strong>
                                       : r.daily_max_concentration
                                         ? <strong>{r.daily_max_concentration} mg/L</strong>
-                                        : "—"}
+                                        : r.monthly_avg_concentration != null
+                                          ? <span><strong>{r.monthly_avg_concentration} mg/L</strong> <span style={{fontSize:10,color:"#718096"}}>(mo. avg)</span></span>
+                                          : "—"}
                               </td>
                               <td style={s.td}>
                                 {r.is_monitor_report
@@ -746,7 +750,7 @@ export default function IUDashboard({ user, onLogout, initialTab }: Props) {
                                           : <span style={s.statusPass}>In Range</span>)
                                     : !hasConc
                                       ? <span style={s.statusNA}>—</span>
-                                      : (exceedsConc || exceedsLoad)
+                                      : (exceedsConc || exceedsLoad || exceedsMonthlyAvg)
                                         ? <span style={s.statusFail}>Exceedance</span>
                                         : <span style={s.statusPass}>Pass</span>}
                               </td>

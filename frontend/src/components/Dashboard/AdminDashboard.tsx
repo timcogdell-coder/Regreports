@@ -2371,7 +2371,12 @@ export default function AdminDashboard({ user, onLogout }: Props) {
                         const exceedsLoad = r.daily_max_loading != null &&
                                             r.loading_result != null &&
                                             r.loading_result > r.daily_max_loading;
-                        const exceedance  = exceedsConc || exceedsLoad;
+                        const exceedsMonthlyAvg = r.daily_max_concentration == null &&
+                                            r.daily_max_loading == null &&
+                                            r.monthly_avg_concentration != null &&
+                                            r.concentration_result != null &&
+                                            r.concentration_result > r.monthly_avg_concentration;
+                        const exceedance  = exceedsConc || exceedsLoad || exceedsMonthlyAvg;
                         const isCorrectingThis = correctionPanel?.permit_limit_id === r.permit_limit_id;
                         return (
                           <tr key={i}
@@ -2393,7 +2398,9 @@ export default function AdminDashboard({ user, onLogout }: Props) {
                                       ? <strong>{r.daily_max_concentration} mg/L</strong>
                                       : r.daily_max_loading != null
                                         ? <strong>{r.daily_max_loading} lbs/day</strong>
-                                        : "—"}
+                                        : r.monthly_avg_concentration != null
+                                          ? <span><strong>{r.monthly_avg_concentration} mg/L</strong> <span style={{fontSize:10,color:"#718096"}}>(mo. avg)</span></span>
+                                          : "—"}
                             </td>
                             <td style={s.td}>
                               {isMR || isRange
