@@ -143,7 +143,8 @@ def _check_result(sample: Sample, result: SampleResult, limit: PermitLimit) -> l
             violations.append(_create_violation(sample, limit, result, "avg_exceeds", pct, link_to_sample=False))
 
     # Check monthly average loading (same sweep-and-re-evaluate logic).
-    if not monthly_mr and loading is not None and limit.monthly_avg_loading is not None:
+    # monthly_avg_is_mr only suppresses the concentration check; loading is enforced independently.
+    if loading is not None and limit.monthly_avg_loading is not None:
         _clear_monthly_avg_violations(sample, limit)
         avg_load = _get_monthly_avg_loading(sample, limit)
         if avg_load is not None and avg_load > limit.monthly_avg_loading:

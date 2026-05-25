@@ -308,7 +308,7 @@ export default function AdminDashboard({ user, onLogout }: Props) {
       weekly_max_concentration:   newLimit.weekly_max_is_mr ? null : (newLimit.weekly_max_concentration   ? parseFloat(newLimit.weekly_max_concentration)   : null),
       weekly_max_loading:         newLimit.weekly_max_is_mr ? null : (newLimit.weekly_max_loading         ? parseFloat(newLimit.weekly_max_loading)         : null),
       monthly_avg_concentration:  newLimit.monthly_avg_is_mr ? null : (newLimit.monthly_avg_concentration  ? parseFloat(newLimit.monthly_avg_concentration)  : null),
-      monthly_avg_loading:        newLimit.monthly_avg_is_mr ? null : (newLimit.monthly_avg_loading        ? parseFloat(newLimit.monthly_avg_loading)        : null),
+      monthly_avg_loading:        newLimit.monthly_avg_loading ? parseFloat(newLimit.monthly_avg_loading) : null,
       frequency_id:               newLimit.frequency_id               ? parseInt(newLimit.frequency_id)                 : null,
       sample_type:                newLimit.sample_type                || null,
       is_monitor_report:          newLimit.is_monitor_report,
@@ -366,7 +366,7 @@ export default function AdminDashboard({ user, onLogout }: Props) {
       weekly_max_concentration:   newLimit.weekly_max_is_mr ? null : (newLimit.weekly_max_concentration   ? parseFloat(newLimit.weekly_max_concentration)   : null),
       weekly_max_loading:         newLimit.weekly_max_is_mr ? null : (newLimit.weekly_max_loading         ? parseFloat(newLimit.weekly_max_loading)         : null),
       monthly_avg_concentration:  newLimit.monthly_avg_is_mr ? null : (newLimit.monthly_avg_concentration  ? parseFloat(newLimit.monthly_avg_concentration)  : null),
-      monthly_avg_loading:        newLimit.monthly_avg_is_mr ? null : (newLimit.monthly_avg_loading        ? parseFloat(newLimit.monthly_avg_loading)        : null),
+      monthly_avg_loading:        newLimit.monthly_avg_loading ? parseFloat(newLimit.monthly_avg_loading) : null,
       frequency_id:               newLimit.frequency_id               ? parseInt(newLimit.frequency_id)                 : null,
       sample_type:                newLimit.sample_type                || null,
       is_monitor_report:          newLimit.is_monitor_report,
@@ -1577,7 +1577,7 @@ export default function AdminDashboard({ user, onLogout }: Props) {
                               <input type="checkbox" checked={newLimit.monthly_avg_is_mr}
                                 onChange={e => setNewLimit(p => ({
                                   ...p, monthly_avg_is_mr: e.target.checked,
-                                  ...(e.target.checked ? {monthly_avg_concentration:"", monthly_avg_loading:""} : {})
+                                  ...(e.target.checked ? {monthly_avg_concentration:""} : {})
                                 }))} />
                               MR
                             </label>
@@ -1587,12 +1587,12 @@ export default function AdminDashboard({ user, onLogout }: Props) {
                           type="number" step="any" value={newLimit.monthly_avg_concentration}
                           disabled={newLimit.is_monitor_report || newLimit.is_range_limit || newLimit.monthly_avg_is_mr}
                           onChange={e => setNewLimit(p => ({...p, monthly_avg_concentration: e.target.value}))} />
-                        <label style={{...s.label, ...(newLimit.is_monitor_report || newLimit.is_range_limit || newLimit.monthly_avg_is_mr ? s.disabledLabel : {})}}>
+                        <label style={{...s.label, ...(newLimit.is_monitor_report || newLimit.is_range_limit ? s.disabledLabel : {})}}>
                           Monthly Avg Loading (lbs/day)
                         </label>
-                        <input style={{...s.input, ...(newLimit.is_monitor_report || newLimit.monthly_avg_is_mr ? s.readOnly : {})}}
+                        <input style={{...s.input, ...(newLimit.is_monitor_report ? s.readOnly : {})}}
                           type="number" step="any" value={newLimit.monthly_avg_loading}
-                          disabled={newLimit.is_monitor_report || newLimit.is_range_limit || newLimit.monthly_avg_is_mr}
+                          disabled={newLimit.is_monitor_report || newLimit.is_range_limit}
                           onChange={e => setNewLimit(p => ({...p, monthly_avg_loading: e.target.value}))} />
                       </>)}
                       <label style={s.label}>Monitoring Frequency</label>
