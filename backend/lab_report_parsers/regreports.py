@@ -383,7 +383,7 @@ def _ocr_pdf(pdf_path: str) -> str:
         pytesseract.pytesseract.tesseract_cmd = _TESSERACT_CMD
 
     poppler = _POPPLER_PATH if os.path.isdir(_POPPLER_PATH) else None
-    images  = convert_from_path(pdf_path, dpi=300, poppler_path=poppler)
+    images  = convert_from_path(pdf_path, dpi=400, poppler_path=poppler)
 
     return "\n".join(
         pytesseract.image_to_string(img, config="--psm 6")

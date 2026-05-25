@@ -71,7 +71,7 @@ Four roles enforced via `utils/decorators.roles_required`:
 - `src/components/Samples/` — `SampleForm.tsx` (sample entry), `MonthlyFlowForm.tsx` (flow report entry)
 
 ### Lab report parser
-`backend/lab_report_parsers/regreports.py` — parses PDF lab reports (text-based via pdfplumber, scanned via OCR fallback). Tesseract/Poppler paths are currently hardcoded to Windows paths at the top of the file.
+`backend/lab_report_parsers/regreports.py` — parses PDF lab reports (text-based via pdfplumber, scanned via OCR fallback). Tesseract (`/usr/bin/tesseract`) and Poppler (`/usr/bin`) paths are set for Linux at the top of the file.
 
 ### Compliance engine: violation types
 | `violation_type` | Trigger |
