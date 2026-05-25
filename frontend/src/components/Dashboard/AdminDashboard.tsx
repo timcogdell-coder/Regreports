@@ -2372,7 +2372,6 @@ export default function AdminDashboard({ user, onLogout }: Props) {
                                             r.loading_result != null &&
                                             r.loading_result > r.daily_max_loading;
                         const exceedsMonthlyAvg = r.daily_max_concentration == null &&
-                                            r.daily_max_loading == null &&
                                             r.monthly_avg_concentration != null &&
                                             r.concentration_result != null &&
                                             r.concentration_result > r.monthly_avg_concentration;
@@ -2393,11 +2392,11 @@ export default function AdminDashboard({ user, onLogout }: Props) {
                                 : isRange
                                   ? <span style={s.rangeBadge}>{r.min_value}—{r.max_value} {r.range_unit}</span>
                                   : r.daily_max_concentration != null && r.daily_max_loading != null
-                                    ? <strong>{r.daily_max_concentration} mg/L / {r.daily_max_loading} lbs/day</strong>
+                                    ? <span><strong>{r.daily_max_concentration} mg/L / {r.daily_max_loading} lbs/day</strong>{r.monthly_avg_concentration != null && <span style={{fontSize:10,color:"#718096"}}> / {r.monthly_avg_concentration} mg/L mo. avg</span>}</span>
                                     : r.daily_max_concentration != null
-                                      ? <strong>{r.daily_max_concentration} mg/L</strong>
+                                      ? <span><strong>{r.daily_max_concentration} mg/L</strong>{r.monthly_avg_concentration != null && <span style={{fontSize:10,color:"#718096"}}> / {r.monthly_avg_concentration} mg/L mo. avg</span>}</span>
                                       : r.daily_max_loading != null
-                                        ? <strong>{r.daily_max_loading} lbs/day</strong>
+                                        ? <span><strong>{r.daily_max_loading} lbs/day</strong>{r.monthly_avg_concentration != null && <span style={{fontSize:10,color:"#718096"}}> / {r.monthly_avg_concentration} mg/L mo. avg</span>}</span>
                                         : r.monthly_avg_concentration != null
                                           ? <span><strong>{r.monthly_avg_concentration} mg/L</strong> <span style={{fontSize:10,color:"#718096"}}>(mo. avg)</span></span>
                                           : "—"}

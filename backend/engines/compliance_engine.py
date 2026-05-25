@@ -51,6 +51,10 @@ def _check_result(sample: Sample, result: SampleResult, limit: PermitLimit) -> l
     conc    = result.concentration_result
     loading = result.loading_result
 
+    # Whole-row MR flag — no numeric limits apply to this parameter at all.
+    if limit.is_monitor_report:
+        return violations
+
     # ── Flow limit (IU-entered MGD value compared directly against permit limit) ──
     # averaging_period selects which limit column to compare against.
     # No loading calculation — straight value vs. limit.

@@ -689,13 +689,13 @@ export default function IUDashboard({ user, onLogout, initialTab }: Props) {
                                                (r.min_value != null && conc < r.min_value) ||
                                                (r.max_value != null && conc > r.max_value));
                           const exceedsConc  = !r.is_range_limit && r.daily_max_concentration && hasConc && conc > r.daily_max_concentration;
-                          const exceedsMonthlyAvg = !r.is_range_limit && !r.daily_max_concentration && !r.daily_max_loading &&
+                          const exceedsMonthlyAvg = !r.is_range_limit && !r.daily_max_concentration &&
                                                      r.monthly_avg_concentration != null && hasConc && conc > r.monthly_avg_concentration;
                           const exceedsLoad  = (loadingOnly || r.is_range_limit) && r.daily_max_loading && calcLoading !== null && calcLoading > r.daily_max_loading;
                           const unit = isPlantFlow ? "MGD" : r.is_range_limit ? (r.range_unit ?? "s.u.") : "mg/L";
 
                           return (
-                            <tr key={i} style={editingAllResults && (exceedsConc || exceedsLoad || outOfRange)
+                            <tr key={i} style={editingAllResults && (exceedsConc || exceedsLoad || exceedsMonthlyAvg || outOfRange)
                               ? {background:"#fff5f5"} : undefined}>
                               <td style={s.td}>
                                 <strong>{r.parameter_name}</strong>
@@ -732,9 +732,9 @@ export default function IUDashboard({ user, onLogout, initialTab }: Props) {
                                     ? <><span style={s.rangeBadge}>{r.min_value ?? "—"}—{r.max_value ?? "—"} {r.range_unit ?? "s.u."}</span>
                                         {r.daily_max_loading != null && <span style={{marginLeft:6,fontSize:12,color:"#2d3748"}}>/ {r.daily_max_loading} lbs/d max</span>}</>
                                     : loadingOnly
-                                      ? <strong>{r.daily_max_loading} lbs/day</strong>
+                                      ? <span><strong>{r.daily_max_loading} lbs/day</strong>{r.monthly_avg_concentration != null && <span style={{fontSize:10,color:"#718096"}}> / {r.monthly_avg_concentration} mg/L mo. avg</span>}</span>
                                       : r.daily_max_concentration
-                                        ? <strong>{r.daily_max_concentration} mg/L</strong>
+                                        ? <span><strong>{r.daily_max_concentration} mg/L</strong>{r.monthly_avg_concentration != null && <span style={{fontSize:10,color:"#718096"}}> / {r.monthly_avg_concentration} mg/L mo. avg</span>}</span>
                                         : r.monthly_avg_concentration != null
                                           ? <span><strong>{r.monthly_avg_concentration} mg/L</strong> <span style={{fontSize:10,color:"#718096"}}>(mo. avg)</span></span>
                                           : "—"}
