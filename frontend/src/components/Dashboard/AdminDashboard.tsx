@@ -52,6 +52,7 @@ export default function AdminDashboard({ user, onLogout }: Props) {
     weekly_max_concentration:"", weekly_max_loading:"",
     monthly_avg_concentration:"", monthly_avg_loading:"",
     frequency_id:"", sample_type:"", is_monitor_report: false,
+    daily_max_is_mr: false, weekly_max_is_mr: false, monthly_avg_is_mr: false,
     is_range_limit: false, min_value:"", max_value:"", range_unit:"s.u.",
     is_flow_limit: false, averaging_period:"daily_max",
   });
@@ -302,15 +303,18 @@ export default function AdminDashboard({ user, onLogout }: Props) {
     setLimitFormError("");
     const buildPayload = (paramId: string) => ({
       parameter_id:               parseInt(paramId),
-      daily_max_concentration:    newLimit.daily_max_concentration    ? parseFloat(newLimit.daily_max_concentration)    : null,
-      daily_max_loading:          newLimit.daily_max_loading          ? parseFloat(newLimit.daily_max_loading)          : null,
-      weekly_max_concentration:   newLimit.weekly_max_concentration   ? parseFloat(newLimit.weekly_max_concentration)   : null,
-      weekly_max_loading:         newLimit.weekly_max_loading         ? parseFloat(newLimit.weekly_max_loading)         : null,
-      monthly_avg_concentration:  newLimit.monthly_avg_concentration  ? parseFloat(newLimit.monthly_avg_concentration)  : null,
-      monthly_avg_loading:        newLimit.monthly_avg_loading        ? parseFloat(newLimit.monthly_avg_loading)        : null,
+      daily_max_concentration:    newLimit.daily_max_is_mr ? null : (newLimit.daily_max_concentration    ? parseFloat(newLimit.daily_max_concentration)    : null),
+      daily_max_loading:          newLimit.daily_max_is_mr ? null : (newLimit.daily_max_loading          ? parseFloat(newLimit.daily_max_loading)          : null),
+      weekly_max_concentration:   newLimit.weekly_max_is_mr ? null : (newLimit.weekly_max_concentration   ? parseFloat(newLimit.weekly_max_concentration)   : null),
+      weekly_max_loading:         newLimit.weekly_max_is_mr ? null : (newLimit.weekly_max_loading         ? parseFloat(newLimit.weekly_max_loading)         : null),
+      monthly_avg_concentration:  newLimit.monthly_avg_is_mr ? null : (newLimit.monthly_avg_concentration  ? parseFloat(newLimit.monthly_avg_concentration)  : null),
+      monthly_avg_loading:        newLimit.monthly_avg_is_mr ? null : (newLimit.monthly_avg_loading        ? parseFloat(newLimit.monthly_avg_loading)        : null),
       frequency_id:               newLimit.frequency_id               ? parseInt(newLimit.frequency_id)                 : null,
       sample_type:                newLimit.sample_type                || null,
       is_monitor_report:          newLimit.is_monitor_report,
+      daily_max_is_mr:            newLimit.daily_max_is_mr,
+      weekly_max_is_mr:           newLimit.weekly_max_is_mr,
+      monthly_avg_is_mr:          newLimit.monthly_avg_is_mr,
       is_range_limit:             newLimit.is_range_limit,
       min_value:                  newLimit.min_value  ? parseFloat(newLimit.min_value)  : null,
       max_value:                  newLimit.max_value  ? parseFloat(newLimit.max_value)  : null,
@@ -340,6 +344,7 @@ export default function AdminDashboard({ user, onLogout }: Props) {
                   weekly_max_concentration:"", weekly_max_loading:"",
                   monthly_avg_concentration:"", monthly_avg_loading:"",
                   frequency_id:"", sample_type:"", is_monitor_report: false,
+                  daily_max_is_mr: false, weekly_max_is_mr: false, monthly_avg_is_mr: false,
                   is_range_limit: false, min_value:"", max_value:"", range_unit:"s.u.",
                   is_flow_limit: false, averaging_period:"daily_max" });
     setParamSearch("");
@@ -356,15 +361,18 @@ export default function AdminDashboard({ user, onLogout }: Props) {
     const payload = {
       parameter_id:               parseInt(newLimit.parameter_id),
       _param_name:                param ? `${param.name} (${param.abbreviation})` : `#${newLimit.parameter_id}`,
-      daily_max_concentration:    newLimit.daily_max_concentration    ? parseFloat(newLimit.daily_max_concentration)    : null,
-      daily_max_loading:          newLimit.daily_max_loading          ? parseFloat(newLimit.daily_max_loading)          : null,
-      weekly_max_concentration:   newLimit.weekly_max_concentration   ? parseFloat(newLimit.weekly_max_concentration)   : null,
-      weekly_max_loading:         newLimit.weekly_max_loading         ? parseFloat(newLimit.weekly_max_loading)         : null,
-      monthly_avg_concentration:  newLimit.monthly_avg_concentration  ? parseFloat(newLimit.monthly_avg_concentration)  : null,
-      monthly_avg_loading:        newLimit.monthly_avg_loading        ? parseFloat(newLimit.monthly_avg_loading)        : null,
+      daily_max_concentration:    newLimit.daily_max_is_mr ? null : (newLimit.daily_max_concentration    ? parseFloat(newLimit.daily_max_concentration)    : null),
+      daily_max_loading:          newLimit.daily_max_is_mr ? null : (newLimit.daily_max_loading          ? parseFloat(newLimit.daily_max_loading)          : null),
+      weekly_max_concentration:   newLimit.weekly_max_is_mr ? null : (newLimit.weekly_max_concentration   ? parseFloat(newLimit.weekly_max_concentration)   : null),
+      weekly_max_loading:         newLimit.weekly_max_is_mr ? null : (newLimit.weekly_max_loading         ? parseFloat(newLimit.weekly_max_loading)         : null),
+      monthly_avg_concentration:  newLimit.monthly_avg_is_mr ? null : (newLimit.monthly_avg_concentration  ? parseFloat(newLimit.monthly_avg_concentration)  : null),
+      monthly_avg_loading:        newLimit.monthly_avg_is_mr ? null : (newLimit.monthly_avg_loading        ? parseFloat(newLimit.monthly_avg_loading)        : null),
       frequency_id:               newLimit.frequency_id               ? parseInt(newLimit.frequency_id)                 : null,
       sample_type:                newLimit.sample_type                || null,
       is_monitor_report:          newLimit.is_monitor_report,
+      daily_max_is_mr:            newLimit.daily_max_is_mr,
+      weekly_max_is_mr:           newLimit.weekly_max_is_mr,
+      monthly_avg_is_mr:          newLimit.monthly_avg_is_mr,
       is_range_limit:             newLimit.is_range_limit,
       min_value:                  newLimit.min_value  ? parseFloat(newLimit.min_value)  : null,
       max_value:                  newLimit.max_value  ? parseFloat(newLimit.max_value)  : null,
@@ -1211,10 +1219,11 @@ export default function AdminDashboard({ user, onLogout }: Props) {
                                   : l.is_flow_limit && l.averaging_period === "daily_max"
                                     ? <strong>{l.daily_max_concentration ?? "—"} MGD</strong>
                                   : l.is_flow_limit ? "—"
+                                  : l.daily_max_is_mr ? <span style={s.mrBadge}>MR</span>
                                   : <strong>{l.daily_max_concentration ?? "—"}</strong>}
                               </td>
                               <td style={{...s.td, textAlign:"center"}}>
-                                {l.is_monitor_report || l.is_flow_limit || l.is_range_limit ? "—"
+                                {l.is_monitor_report || l.is_flow_limit || l.is_range_limit || l.daily_max_is_mr ? "—"
                                   : <strong>{l.daily_max_loading ?? "—"}</strong>}
                               </td>
                               <td style={{...s.td, textAlign:"center"}}>
@@ -1222,10 +1231,11 @@ export default function AdminDashboard({ user, onLogout }: Props) {
                                   : l.is_flow_limit && l.averaging_period === "weekly_max"
                                     ? <strong>{l.weekly_max_concentration ?? "—"} MGD</strong>
                                   : l.is_flow_limit ? "—"
+                                  : l.weekly_max_is_mr ? <span style={s.mrBadge}>MR</span>
                                   : <strong>{l.weekly_max_concentration ?? "—"}</strong>}
                               </td>
                               <td style={{...s.td, textAlign:"center"}}>
-                                {l.is_monitor_report || l.is_range_limit || l.is_flow_limit ? "—"
+                                {l.is_monitor_report || l.is_range_limit || l.is_flow_limit || l.weekly_max_is_mr ? "—"
                                   : <strong>{l.weekly_max_loading ?? "—"}</strong>}
                               </td>
                               <td style={{...s.td, textAlign:"center"}}>
@@ -1234,10 +1244,11 @@ export default function AdminDashboard({ user, onLogout }: Props) {
                                   : l.is_flow_limit && l.averaging_period === "monthly_avg"
                                     ? <strong>{l.monthly_avg_concentration ?? "—"} MGD</strong>
                                   : l.is_flow_limit ? "—"
+                                  : l.monthly_avg_is_mr ? <span style={s.mrBadge}>MR</span>
                                   : <strong>{l.monthly_avg_concentration ?? "—"}</strong>}
                               </td>
                               <td style={{...s.td, textAlign:"center"}}>
-                                {l.is_monitor_report || l.is_range_limit || l.is_flow_limit ? "—"
+                                {l.is_monitor_report || l.is_range_limit || l.is_flow_limit || l.monthly_avg_is_mr ? "—"
                                   : <strong>{l.monthly_avg_loading ?? "—"}</strong>}
                               </td>
                               <td style={{...s.td, textAlign:"center"}}>{l.frequency_description ?? "—"}</td>
@@ -1401,6 +1412,7 @@ export default function AdminDashboard({ user, onLogout }: Props) {
                               daily_max_concentration:"", daily_max_loading:"",
                               weekly_max_concentration:"", weekly_max_loading:"",
                               monthly_avg_concentration:"", monthly_avg_loading:"",
+                              daily_max_is_mr: false, weekly_max_is_mr: false, monthly_avg_is_mr: false,
                               is_range_limit: false, min_value:"", max_value:""
                             } : {})
                           }))} />
@@ -1499,47 +1511,88 @@ export default function AdminDashboard({ user, onLogout }: Props) {
                         </>)}
                       </>) : (<>
                         {/* Standard concentration / loading fields */}
-                        <label style={{...s.label, ...(newLimit.is_monitor_report || newLimit.is_range_limit ? s.disabledLabel : {})}}>
-                          Daily Max Concentration (mg/L)
-                        </label>
-                        <input style={{...s.input, ...(newLimit.is_monitor_report ? s.readOnly : {})}}
+                        {/* ── Daily Max ── */}
+                        <div style={{display:"flex", alignItems:"center", gap:6, marginBottom:2}}>
+                          <label style={{...s.label, margin:0, flex:1, ...(newLimit.is_monitor_report || newLimit.is_range_limit ? s.disabledLabel : {})}}>
+                            Daily Max Concentration (mg/L)
+                          </label>
+                          {!newLimit.is_monitor_report && !newLimit.is_range_limit && (
+                            <label style={{display:"flex", alignItems:"center", gap:4, fontSize:12, color:"#553c9a", whiteSpace:"nowrap"}}>
+                              <input type="checkbox" checked={newLimit.daily_max_is_mr}
+                                onChange={e => setNewLimit(p => ({
+                                  ...p, daily_max_is_mr: e.target.checked,
+                                  ...(e.target.checked ? {daily_max_concentration:"", daily_max_loading:""} : {})
+                                }))} />
+                              MR
+                            </label>
+                          )}
+                        </div>
+                        <input style={{...s.input, ...(newLimit.is_monitor_report || newLimit.daily_max_is_mr ? s.readOnly : {})}}
                           type="number" step="any" value={newLimit.daily_max_concentration}
-                          disabled={newLimit.is_monitor_report || newLimit.is_range_limit}
+                          disabled={newLimit.is_monitor_report || newLimit.is_range_limit || newLimit.daily_max_is_mr}
                           onChange={e => setNewLimit(p => ({...p, daily_max_concentration: e.target.value}))} />
-                        <label style={{...s.label, ...(newLimit.is_monitor_report ? s.disabledLabel : {})}}>
+                        <label style={{...s.label, ...(newLimit.is_monitor_report || newLimit.daily_max_is_mr ? s.disabledLabel : {})}}>
                           Daily Max Loading (lbs/day){newLimit.is_range_limit && <span style={{fontSize:11,color:"#718096",marginLeft:6}}>(optional)</span>}
                         </label>
-                        <input style={{...s.input, ...(newLimit.is_monitor_report ? s.readOnly : {})}}
+                        <input style={{...s.input, ...(newLimit.is_monitor_report || newLimit.daily_max_is_mr ? s.readOnly : {})}}
                           type="number" step="any" value={newLimit.daily_max_loading}
-                          disabled={newLimit.is_monitor_report}
+                          disabled={newLimit.is_monitor_report || newLimit.daily_max_is_mr}
                           onChange={e => setNewLimit(p => ({...p, daily_max_loading: e.target.value}))} />
-                        <label style={{...s.label, ...(newLimit.is_monitor_report || newLimit.is_range_limit ? s.disabledLabel : {})}}>
-                          Weekly Max Concentration (mg/L) <span style={{fontSize:11,color:"#718096"}}>(7-day avg)</span>
-                        </label>
-                        <input style={{...s.input, ...(newLimit.is_monitor_report ? s.readOnly : {})}}
+
+                        {/* ── Weekly Max ── */}
+                        <div style={{display:"flex", alignItems:"center", gap:6, marginBottom:2}}>
+                          <label style={{...s.label, margin:0, flex:1, ...(newLimit.is_monitor_report || newLimit.is_range_limit ? s.disabledLabel : {})}}>
+                            Weekly Max Concentration (mg/L) <span style={{fontSize:11,color:"#718096"}}>(7-day avg)</span>
+                          </label>
+                          {!newLimit.is_monitor_report && !newLimit.is_range_limit && (
+                            <label style={{display:"flex", alignItems:"center", gap:4, fontSize:12, color:"#553c9a", whiteSpace:"nowrap"}}>
+                              <input type="checkbox" checked={newLimit.weekly_max_is_mr}
+                                onChange={e => setNewLimit(p => ({
+                                  ...p, weekly_max_is_mr: e.target.checked,
+                                  ...(e.target.checked ? {weekly_max_concentration:"", weekly_max_loading:""} : {})
+                                }))} />
+                              MR
+                            </label>
+                          )}
+                        </div>
+                        <input style={{...s.input, ...(newLimit.is_monitor_report || newLimit.weekly_max_is_mr ? s.readOnly : {})}}
                           type="number" step="any" value={newLimit.weekly_max_concentration}
-                          disabled={newLimit.is_monitor_report || newLimit.is_range_limit}
+                          disabled={newLimit.is_monitor_report || newLimit.is_range_limit || newLimit.weekly_max_is_mr}
                           onChange={e => setNewLimit(p => ({...p, weekly_max_concentration: e.target.value}))} />
-                        <label style={{...s.label, ...(newLimit.is_monitor_report || newLimit.is_range_limit ? s.disabledLabel : {})}}>
+                        <label style={{...s.label, ...(newLimit.is_monitor_report || newLimit.is_range_limit || newLimit.weekly_max_is_mr ? s.disabledLabel : {})}}>
                           Weekly Max Loading (lbs/day)
                         </label>
-                        <input style={{...s.input, ...(newLimit.is_monitor_report ? s.readOnly : {})}}
+                        <input style={{...s.input, ...(newLimit.is_monitor_report || newLimit.weekly_max_is_mr ? s.readOnly : {})}}
                           type="number" step="any" value={newLimit.weekly_max_loading}
-                          disabled={newLimit.is_monitor_report || newLimit.is_range_limit}
+                          disabled={newLimit.is_monitor_report || newLimit.is_range_limit || newLimit.weekly_max_is_mr}
                           onChange={e => setNewLimit(p => ({...p, weekly_max_loading: e.target.value}))} />
-                        <label style={{...s.label, ...(newLimit.is_monitor_report || newLimit.is_range_limit ? s.disabledLabel : {})}}>
-                          Monthly Avg Concentration (mg/L)
-                        </label>
-                        <input style={{...s.input, ...(newLimit.is_monitor_report ? s.readOnly : {})}}
+
+                        {/* ── Monthly Avg ── */}
+                        <div style={{display:"flex", alignItems:"center", gap:6, marginBottom:2}}>
+                          <label style={{...s.label, margin:0, flex:1, ...(newLimit.is_monitor_report || newLimit.is_range_limit ? s.disabledLabel : {})}}>
+                            Monthly Avg Concentration (mg/L)
+                          </label>
+                          {!newLimit.is_monitor_report && !newLimit.is_range_limit && (
+                            <label style={{display:"flex", alignItems:"center", gap:4, fontSize:12, color:"#553c9a", whiteSpace:"nowrap"}}>
+                              <input type="checkbox" checked={newLimit.monthly_avg_is_mr}
+                                onChange={e => setNewLimit(p => ({
+                                  ...p, monthly_avg_is_mr: e.target.checked,
+                                  ...(e.target.checked ? {monthly_avg_concentration:"", monthly_avg_loading:""} : {})
+                                }))} />
+                              MR
+                            </label>
+                          )}
+                        </div>
+                        <input style={{...s.input, ...(newLimit.is_monitor_report || newLimit.monthly_avg_is_mr ? s.readOnly : {})}}
                           type="number" step="any" value={newLimit.monthly_avg_concentration}
-                          disabled={newLimit.is_monitor_report || newLimit.is_range_limit}
+                          disabled={newLimit.is_monitor_report || newLimit.is_range_limit || newLimit.monthly_avg_is_mr}
                           onChange={e => setNewLimit(p => ({...p, monthly_avg_concentration: e.target.value}))} />
-                        <label style={{...s.label, ...(newLimit.is_monitor_report || newLimit.is_range_limit ? s.disabledLabel : {})}}>
+                        <label style={{...s.label, ...(newLimit.is_monitor_report || newLimit.is_range_limit || newLimit.monthly_avg_is_mr ? s.disabledLabel : {})}}>
                           Monthly Avg Loading (lbs/day)
                         </label>
-                        <input style={{...s.input, ...(newLimit.is_monitor_report ? s.readOnly : {})}}
+                        <input style={{...s.input, ...(newLimit.is_monitor_report || newLimit.monthly_avg_is_mr ? s.readOnly : {})}}
                           type="number" step="any" value={newLimit.monthly_avg_loading}
-                          disabled={newLimit.is_monitor_report || newLimit.is_range_limit}
+                          disabled={newLimit.is_monitor_report || newLimit.is_range_limit || newLimit.monthly_avg_is_mr}
                           onChange={e => setNewLimit(p => ({...p, monthly_avg_loading: e.target.value}))} />
                       </>)}
                       <label style={s.label}>Monitoring Frequency</label>
@@ -1664,6 +1717,9 @@ export default function AdminDashboard({ user, onLogout }: Props) {
                                       frequency_id:             l.frequency_id             != null ? String(l.frequency_id)             : "",
                                       sample_type:              l.sample_type              ?? "",
                                       is_monitor_report:        l.is_monitor_report        ?? false,
+                                      daily_max_is_mr:          l.daily_max_is_mr          ?? false,
+                                      weekly_max_is_mr:         l.weekly_max_is_mr         ?? false,
+                                      monthly_avg_is_mr:        l.monthly_avg_is_mr        ?? false,
                                       is_range_limit:           l.is_range_limit           ?? false,
                                       min_value:                l.min_value                != null ? String(l.min_value) : "",
                                       max_value:                l.max_value                != null ? String(l.max_value) : "",
@@ -1681,24 +1737,29 @@ export default function AdminDashboard({ user, onLogout }: Props) {
                                       : l.is_range_limit ? <span style={s.rangeBadge}>{l.min_value ?? "—"} — {l.max_value ?? "—"} {l.range_unit}</span>
                                       : l.is_flow_limit
                                         ? <strong>{l.daily_max_concentration ?? "—"} MGD</strong>
+                                      : l.daily_max_is_mr ? <span style={s.mrBadge}>MR</span>
                                       : <strong>{l.daily_max_concentration ?? "—"}</strong>}
                                   </td>
                                   <td style={{textAlign:"center"}}>
-                                    {l.is_monitor_report || l.is_flow_limit ? "—"
+                                    {l.is_monitor_report || l.is_flow_limit || l.daily_max_is_mr ? "—"
                                       : <strong>{l.daily_max_loading ?? "—"}</strong>}
                                   </td>
-                                  <td style={{textAlign:"center"}}>{l.is_monitor_report || l.is_range_limit || l.is_flow_limit ? "—" : <strong>{l.weekly_max_concentration ?? "—"}</strong>}</td>
-                                  <td style={{textAlign:"center"}}>{l.is_monitor_report || l.is_range_limit || l.is_flow_limit ? "—" : <strong>{l.weekly_max_loading ?? "—"}</strong>}</td>
+                                  <td style={{textAlign:"center"}}>
+                                    {l.is_monitor_report || l.is_range_limit || l.is_flow_limit ? "—"
+                                      : l.weekly_max_is_mr ? <span style={s.mrBadge}>MR</span>
+                                      : <strong>{l.weekly_max_concentration ?? "—"}</strong>}
+                                  </td>
+                                  <td style={{textAlign:"center"}}>{l.is_monitor_report || l.is_range_limit || l.is_flow_limit || l.weekly_max_is_mr ? "—" : <strong>{l.weekly_max_loading ?? "—"}</strong>}</td>
                                   <td style={{textAlign:"center"}}>
                                     {l.is_monitor_report ? <span style={s.mrBadge}>MR</span>
                                       : l.is_range_limit ? "—"
                                       : l.is_flow_limit
                                         ? <strong>{l.monthly_avg_concentration ?? "—"} MGD</strong>
+                                      : l.monthly_avg_is_mr ? <span style={s.mrBadge}>MR</span>
                                       : <strong>{l.monthly_avg_concentration ?? "—"}</strong>}
                                   </td>
                                   <td style={{textAlign:"center"}}>
-                                    {l.is_monitor_report || l.is_flow_limit ? "—"
-                                      : l.is_range_limit ? "—"
+                                    {l.is_monitor_report || l.is_flow_limit || l.is_range_limit || l.monthly_avg_is_mr ? "—"
                                       : <strong>{l.monthly_avg_loading ?? "—"}</strong>}
                                   </td>
                                   <td style={{textAlign:"center"}}>{l.frequency_description ?? "—"}</td>

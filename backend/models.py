@@ -139,7 +139,10 @@ class PermitLimit(db.Model):
     frequency_id                = db.Column(db.Integer, db.ForeignKey("tbl_frequency.id"))
     limit_type_id               = db.Column(db.Integer, db.ForeignKey("tbl_limit_type.id"))
     sample_type                 = db.Column(db.String(30))  # grab, composite, continuous
-    is_monitor_report           = db.Column(db.Boolean, default=False)  # MR — no numeric limit
+    is_monitor_report           = db.Column(db.Boolean, default=False)  # MR — entire row has no numeric limit
+    daily_max_is_mr             = db.Column(db.Boolean, default=False)  # daily max column is MR only
+    weekly_max_is_mr            = db.Column(db.Boolean, default=False)  # weekly max column is MR only
+    monthly_avg_is_mr           = db.Column(db.Boolean, default=False)  # monthly avg column is MR only
     is_range_limit              = db.Column(db.Boolean, default=False)   # min/max range (e.g. pH)
     min_value                   = db.Column(db.Float)
     max_value                   = db.Column(db.Float)
@@ -165,6 +168,9 @@ class PermitLimit(db.Model):
                 "frequency_description": self.frequency.description if self.frequency else None,
                 "sample_type": self.sample_type,
                 "is_monitor_report": self.is_monitor_report or False,
+                "daily_max_is_mr": self.daily_max_is_mr or False,
+                "weekly_max_is_mr": self.weekly_max_is_mr or False,
+                "monthly_avg_is_mr": self.monthly_avg_is_mr or False,
                 "is_range_limit": self.is_range_limit or False,
                 "min_value": self.min_value,
                 "max_value": self.max_value,
