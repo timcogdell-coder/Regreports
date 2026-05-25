@@ -240,13 +240,30 @@ def recalculate_compliance():
     data       = request.get_json(silent=True) or {}
     company_id = data.get("company_id")   # optional — recalculate one company
 
-    # ── Step 1: clear sample-linked violations ───────────────────────────────
+    # ── Step 1: clear all violations (sample-linked AND period-level) ──────────
+    # Period-level avg/weekly violations (sample_id=NULL) are now separated from
+    # sample-specific violations so they don't migrate between samples on recalculate.
+    # Clear them up front so the re-evaluation below starts from a clean slate.
     sample_q = Sample.query
     if company_id:
         sample_q = sample_q.filter_by(company_id=int(company_id))
     samples = sample_q.order_by(Sample.sample_date).all()
 
-    cleared = 0
+    period_viol_q = Violation.query.filter(
+        Violation.sample_id.is_(None),
+        Violation.violation_type.in_(["avg_exceeds", "weekly_avg_exceeds"]),
+    )
+    if company_id:
+        period_viol_q = period_viol_q.filter(Violation.company_id == int(company_id))
+    period_vids = [v.id for v in period_viol_q.all()]
+    if period_vids:
+        EnforcementHistory.query.filter(
+            EnforcementHistory.violation_id.in_(period_vids)
+        ).delete(synchronize_session=False)
+        Violation.query.filter(Violation.id.in_(period_vids)).delete(synchronize_session=False)
+        db.session.commit()
+
+    cleared = len(period_vids)
     new_violations = 0
     errors = 0
 

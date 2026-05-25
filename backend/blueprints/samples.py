@@ -138,7 +138,25 @@ def get_sample(sample_id):
             "max_value":                 limit.max_value                 if limit else None,
         })
 
+    # Sample-linked violations (max/range/flow — tied to this specific event).
     violations = [v.to_dict() for v in sample.violations]
+
+    # Period-level violations (avg/weekly — sample_id=NULL, scoped to this company/month).
+    # Include them here so the review panel can show the full compliance picture.
+    from datetime import date as _date
+    sd = sample.sample_date
+    period_viols = (
+        Violation.query
+        .filter(
+            Violation.company_id      == sample.company_id,
+            Violation.sample_id.is_(None),
+            Violation.violation_type.in_(["avg_exceeds", "weekly_avg_exceeds"]),
+            db.func.extract("month", Violation.violation_date) == sd.month,
+            db.func.extract("year",  Violation.violation_date) == sd.year,
+        )
+        .all()
+    )
+    violations += [v.to_dict() for v in period_viols]
 
     data = sample.to_dict()
     data["company_name"]  = company.name if company else None
