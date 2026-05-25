@@ -206,6 +206,25 @@ def _is_number(s: str) -> bool:
     return bool(_RE_IS_NUMBER.match(s))
 
 
+def _is_continuation_line(line: str) -> bool:
+    """Return True if this short line looks like a wrapped portion of the previous analyte name.
+
+    Genuine continuations start with '(', a digit, or a lowercase letter (e.g. '2540D)',
+    '(SM5210B)', 'oxygen Demand...'). Lines starting with uppercase are footers or new
+    sections, not continuations.
+    """
+    tokens = line.split()
+    if not tokens or len(tokens) > 4:
+        return False
+    if line[0].isupper():
+        return False
+    if any(_RE_DATE_TOKEN.match(t) for t in tokens):
+        return False
+    if _find_unit_in(tokens)[0] is not None:
+        return False
+    return True
+
+
 def _find_unit_in(tokens: list[str]) -> tuple[Optional[str], Optional[int]]:
     """
     Return (unit_string, unit_start_index) or (None, None).
@@ -320,6 +339,7 @@ def _parse_ocr_text(all_text: str) -> list[SampleGroup]:
     samples: list[SampleGroup] = []
     current_sample: Optional[SampleGroup] = None
     current_method = "Unknown"
+    last_result: Optional[AnalyteResult] = None
 
     for raw_line in all_text.splitlines():
         line = _strip_pipes(raw_line)
@@ -329,6 +349,7 @@ def _parse_ocr_text(all_text: str) -> list[SampleGroup]:
         # --- Sample header ---
         cs = _RE_CLIENT_SAMPLE.search(line)
         if cs:
+            last_result = None
             current_sample = SampleGroup(
                 client_sample_id = cs.group(1).strip(),
                 lab_sample_id    = _first(_RE_LAB_SAMPLE, line),
@@ -343,11 +364,19 @@ def _parse_ocr_text(all_text: str) -> list[SampleGroup]:
         # --- Method header ---
         mm = _RE_METHOD_LINE.search(line)
         if mm:
+            last_result = None
             current_method = _strip_pipes(mm.group(1))
             continue
 
         if re.match(r"^(General Chemistry|Microbiology|Metals|Radiochemistry|Inorganics|Organics)", line, re.I):
+            last_result = None
             current_method = line
+            continue
+
+        # --- Continuation of a wrapped analyte name ---
+        if last_result is not None and _is_continuation_line(line):
+            last_result.analyte = (last_result.analyte + " " + line).strip(".,;!|")
+            last_result = None
             continue
 
         # --- Result row ---
@@ -363,6 +392,9 @@ def _parse_ocr_text(all_text: str) -> list[SampleGroup]:
                 )
                 samples.append(current_sample)
             current_sample.results.append(result)
+            last_result = result
+        else:
+            last_result = None
 
     return samples
 
