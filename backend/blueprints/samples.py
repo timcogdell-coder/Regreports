@@ -215,6 +215,17 @@ def update_sample(sample_id):
     db.session.commit()
 
     # Re-run compliance with updated values
+    # Recalculate loading_result for all results first so compliance sees current flow_mgd.
+    # This is essential when flow_mgd was corrected after initial submission.
+    for r in SampleResult.query.filter_by(sample_id=sample_id).all():
+        cf = (r.permit_limit.parameter.conversion_factor
+              if r.permit_limit and r.permit_limit.parameter else None)
+        if cf and sample.flow_mgd and r.concentration_result is not None:
+            r.loading_result = round(r.concentration_result * sample.flow_mgd * cf, 4)
+        elif not sample.flow_mgd:
+            r.loading_result = None
+    db.session.commit()
+
     # Must delete enforcement history before violations (FK constraint)
     from models import EnforcementHistory
     violation_ids = [v.id for v in Violation.query.filter_by(sample_id=sample_id).all()]

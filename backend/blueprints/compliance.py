@@ -261,6 +261,15 @@ def recalculate_compliance():
                 db.session.commit()
                 cleared += len(vids)
 
+            for r in SampleResult.query.filter_by(sample_id=sample.id).all():
+                cf = (r.permit_limit.parameter.conversion_factor
+                      if r.permit_limit and r.permit_limit.parameter else None)
+                if cf and sample.flow_mgd and r.concentration_result is not None:
+                    r.loading_result = round(r.concentration_result * sample.flow_mgd * cf, 4)
+                elif not sample.flow_mgd:
+                    r.loading_result = None
+            db.session.commit()
+
             violations = check_compliance(sample)
             new_violations += len(violations)
             for v in violations:
