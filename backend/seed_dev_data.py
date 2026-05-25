@@ -137,20 +137,20 @@ FLOW_METERS = [
 
 # (id, company_id, permit_id, sample_date, sampler_name, temperature, coc_form_data, flow_mgd, sampling_days, submitted_by, review_status, reviewed_by, is_corrected)
 SAMPLES = [
-    ( 3, 3, 2, date(2025,12, 3), "eurofins",        0.368,               "100", 21.2, 31, 3, "reviewed", 1, False),
-    ( 4, 3, 2, date(2025,12,10), "eurofins",        0.398,               "100", 20.0, 31, 3, "reviewed", 4, False),
-    ( 5, 3, 2, date(2025,12,17), "eurofins",        0.455,               "100", 22.5, 31, 3, "reviewed", 4, False),
-    ( 6, 3, 2, date(2025,12,23), "eurofins",        0.603,               "100", 26.0, 31, 3, "reviewed", 4, False),
-    (10, 3, 2, date(2025,12,31), "eurofins",        0.011935483870967743,"100", 20.0, 31, 4, "reviewed", 4, False),
-    (13, 3, 2, date(2026, 4, 1), "eurofins",        0.398,               "100", 20.0, 30, 4, "reviewed", 4, False),
-    (14, 3, 2, date(2026, 4, 8), "eurofins",        0.386,               "100", 20.0, 30, 4, "reviewed", 4, False),
-    (15, 3, 2, date(2026, 4,15), "eurofins",        0.396,               "100", 28.0, 30, 4, "reviewed", 4, False),
-    (16, 3, 2, date(2026, 4,22), "eurofins",        0.437,               "100", 26.0, 30, 4, "reviewed", 4, False),
-    (18, 3, 2, date(2026, 4,29), "eurofins",        0.436,               "100", 20.0, 30, 4, "reviewed", 4, False),
-    (21, 5, 5, date(2026, 4, 7), "eurofins",        0.059054,            "1",   21.0, 30, 4, "reviewed", 4, False),
-    (22, 4, 4, date(2026, 4,14), "Pace Analytical", 0.000841,            "1",   26.0, 30, 4, "reviewed", 4, False),
-    (23, 7, 7, date(2026, 4,30), "self",            None,                "1",   17.9, 30, 4, "reviewed", 4, False),
-    (24, 7, 7, date(2026, 4, 8), "self",            0.0,                 "1",   25.0, 30, 4, "reviewed", 4, False),
+    ( 3, 3, 2, date(2025,12, 3), "eurofins",        None,  "100",  0.368,               31, 3, "reviewed", 1, False),
+    ( 4, 3, 2, date(2025,12,10), "eurofins",        None,  "100",  0.398,               31, 3, "reviewed", 4, False),
+    ( 5, 3, 2, date(2025,12,17), "eurofins",        None,  "100",  0.455,               31, 3, "reviewed", 4, False),
+    ( 6, 3, 2, date(2025,12,23), "eurofins",        None,  "100",  0.603,               31, 3, "reviewed", 4, False),
+    (10, 3, 2, date(2025,12,31), "eurofins",        None,  "100",  0.011935483870967743, 31, 4, "reviewed", 4, False),
+    (13, 3, 2, date(2026, 4, 1), "eurofins",        None,  "100",  0.398,               30, 4, "reviewed", 4, False),
+    (14, 3, 2, date(2026, 4, 8), "eurofins",        None,  "100",  0.386,               30, 4, "reviewed", 4, False),
+    (15, 3, 2, date(2026, 4,15), "eurofins",        None,  "100",  0.396,               30, 4, "reviewed", 4, False),
+    (16, 3, 2, date(2026, 4,22), "eurofins",        None,  "100",  0.437,               30, 4, "reviewed", 4, False),
+    (18, 3, 2, date(2026, 4,29), "eurofins",        None,  "100",  0.436,               30, 4, "reviewed", 4, False),
+    (21, 5, 5, date(2026, 4, 7), "eurofins",        None,  "1",    0.059054,            30, 4, "reviewed", 4, False),
+    (22, 4, 4, date(2026, 4,14), "Pace Analytical", None,  "1",    0.000841,            30, 4, "reviewed", 4, False),
+    (23, 7, 7, date(2026, 4,30), "self",            None,  "1",    None,                30, 4, "reviewed", 4, False),
+    (24, 7, 7, date(2026, 4, 8), "self",            None,  "1",    None,                30, 4, "reviewed", 4, False),
 ]
 
 # (id, sample_id, permit_limit_id, concentration_result, loading_result)
