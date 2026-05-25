@@ -304,7 +304,7 @@ export default function AdminDashboard({ user, onLogout }: Props) {
     const buildPayload = (paramId: string) => ({
       parameter_id:               parseInt(paramId),
       daily_max_concentration:    newLimit.daily_max_is_mr ? null : (newLimit.daily_max_concentration    ? parseFloat(newLimit.daily_max_concentration)    : null),
-      daily_max_loading:          newLimit.daily_max_is_mr ? null : (newLimit.daily_max_loading          ? parseFloat(newLimit.daily_max_loading)          : null),
+      daily_max_loading:          newLimit.daily_max_loading ? parseFloat(newLimit.daily_max_loading) : null,
       weekly_max_concentration:   newLimit.weekly_max_is_mr ? null : (newLimit.weekly_max_concentration   ? parseFloat(newLimit.weekly_max_concentration)   : null),
       weekly_max_loading:         newLimit.weekly_max_is_mr ? null : (newLimit.weekly_max_loading         ? parseFloat(newLimit.weekly_max_loading)         : null),
       monthly_avg_concentration:  newLimit.monthly_avg_is_mr ? null : (newLimit.monthly_avg_concentration  ? parseFloat(newLimit.monthly_avg_concentration)  : null),
@@ -362,7 +362,7 @@ export default function AdminDashboard({ user, onLogout }: Props) {
       parameter_id:               parseInt(newLimit.parameter_id),
       _param_name:                param ? `${param.name} (${param.abbreviation})` : `#${newLimit.parameter_id}`,
       daily_max_concentration:    newLimit.daily_max_is_mr ? null : (newLimit.daily_max_concentration    ? parseFloat(newLimit.daily_max_concentration)    : null),
-      daily_max_loading:          newLimit.daily_max_is_mr ? null : (newLimit.daily_max_loading          ? parseFloat(newLimit.daily_max_loading)          : null),
+      daily_max_loading:          newLimit.daily_max_loading ? parseFloat(newLimit.daily_max_loading) : null,
       weekly_max_concentration:   newLimit.weekly_max_is_mr ? null : (newLimit.weekly_max_concentration   ? parseFloat(newLimit.weekly_max_concentration)   : null),
       weekly_max_loading:         newLimit.weekly_max_is_mr ? null : (newLimit.weekly_max_loading         ? parseFloat(newLimit.weekly_max_loading)         : null),
       monthly_avg_concentration:  newLimit.monthly_avg_is_mr ? null : (newLimit.monthly_avg_concentration  ? parseFloat(newLimit.monthly_avg_concentration)  : null),
@@ -1521,7 +1521,7 @@ export default function AdminDashboard({ user, onLogout }: Props) {
                               <input type="checkbox" checked={newLimit.daily_max_is_mr}
                                 onChange={e => setNewLimit(p => ({
                                   ...p, daily_max_is_mr: e.target.checked,
-                                  ...(e.target.checked ? {daily_max_concentration:"", daily_max_loading:""} : {})
+                                  ...(e.target.checked ? {daily_max_concentration:""} : {})
                                 }))} />
                               MR
                             </label>
@@ -1531,12 +1531,12 @@ export default function AdminDashboard({ user, onLogout }: Props) {
                           type="number" step="any" value={newLimit.daily_max_concentration}
                           disabled={newLimit.is_monitor_report || newLimit.is_range_limit || newLimit.daily_max_is_mr}
                           onChange={e => setNewLimit(p => ({...p, daily_max_concentration: e.target.value}))} />
-                        <label style={{...s.label, ...(newLimit.is_monitor_report || newLimit.daily_max_is_mr ? s.disabledLabel : {})}}>
+                        <label style={{...s.label, ...(newLimit.is_monitor_report ? s.disabledLabel : {})}}>
                           Daily Max Loading (lbs/day){newLimit.is_range_limit && <span style={{fontSize:11,color:"#718096",marginLeft:6}}>(optional)</span>}
                         </label>
-                        <input style={{...s.input, ...(newLimit.is_monitor_report || newLimit.daily_max_is_mr ? s.readOnly : {})}}
+                        <input style={{...s.input, ...(newLimit.is_monitor_report ? s.readOnly : {})}}
                           type="number" step="any" value={newLimit.daily_max_loading}
-                          disabled={newLimit.is_monitor_report || newLimit.daily_max_is_mr}
+                          disabled={newLimit.is_monitor_report}
                           onChange={e => setNewLimit(p => ({...p, daily_max_loading: e.target.value}))} />
 
                         {/* ── Weekly Max ── */}

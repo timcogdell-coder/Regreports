@@ -93,25 +93,17 @@ def _check_result(sample: Sample, result: SampleResult, limit: PermitLimit) -> l
     weekly_mr  = limit.weekly_max_is_mr  or False
     monthly_mr = limit.monthly_avg_is_mr or False
 
-    loading_only = (limit.daily_max_loading is not None and limit.daily_max_concentration is None)
-
+    # daily_max_is_mr suppresses the concentration check only; loading is enforced independently.
     if not daily_mr:
-        if loading_only:
-            if loading is not None and loading > limit.daily_max_loading:
-                pct = _exceedance_pct(loading, limit.daily_max_loading)
+        if conc is not None and limit.daily_max_concentration is not None:
+            if conc > limit.daily_max_concentration:
+                pct = _exceedance_pct(conc, limit.daily_max_concentration)
                 violations.append(_create_violation(sample, limit, result, "max_exceeds", pct))
-        else:
-            # Check daily max concentration
-            if conc is not None and limit.daily_max_concentration is not None:
-                if conc > limit.daily_max_concentration:
-                    pct = _exceedance_pct(conc, limit.daily_max_concentration)
-                    violations.append(_create_violation(sample, limit, result, "max_exceeds", pct))
 
-            # Check daily max loading (when both limits exist, check both independently)
-            if loading is not None and limit.daily_max_loading is not None:
-                if loading > limit.daily_max_loading:
-                    pct = _exceedance_pct(loading, limit.daily_max_loading)
-                    violations.append(_create_violation(sample, limit, result, "max_exceeds", pct))
+    if loading is not None and limit.daily_max_loading is not None:
+        if loading > limit.daily_max_loading:
+            pct = _exceedance_pct(loading, limit.daily_max_loading)
+            violations.append(_create_violation(sample, limit, result, "max_exceeds", pct))
 
     # Check weekly maximum concentration (7-day average, ISO Mon–Sun).
     # avg/weekly violations are period-level: sample_id is left NULL so they don't
