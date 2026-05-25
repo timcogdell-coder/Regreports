@@ -1223,7 +1223,7 @@ export default function AdminDashboard({ user, onLogout }: Props) {
                                   : <strong>{l.daily_max_concentration ?? "—"}</strong>}
                               </td>
                               <td style={{...s.td, textAlign:"center"}}>
-                                {l.is_monitor_report || l.is_flow_limit || l.is_range_limit || l.daily_max_is_mr ? "—"
+                                {l.is_monitor_report || l.is_flow_limit || l.is_range_limit ? "—"
                                   : <strong>{l.daily_max_loading ?? "—"}</strong>}
                               </td>
                               <td style={{...s.td, textAlign:"center"}}>
@@ -1235,7 +1235,7 @@ export default function AdminDashboard({ user, onLogout }: Props) {
                                   : <strong>{l.weekly_max_concentration ?? "—"}</strong>}
                               </td>
                               <td style={{...s.td, textAlign:"center"}}>
-                                {l.is_monitor_report || l.is_range_limit || l.is_flow_limit || l.weekly_max_is_mr ? "—"
+                                {l.is_monitor_report || l.is_range_limit || l.is_flow_limit ? "—"
                                   : <strong>{l.weekly_max_loading ?? "—"}</strong>}
                               </td>
                               <td style={{...s.td, textAlign:"center"}}>
@@ -1248,7 +1248,7 @@ export default function AdminDashboard({ user, onLogout }: Props) {
                                   : <strong>{l.monthly_avg_concentration ?? "—"}</strong>}
                               </td>
                               <td style={{...s.td, textAlign:"center"}}>
-                                {l.is_monitor_report || l.is_range_limit || l.is_flow_limit || l.monthly_avg_is_mr ? "—"
+                                {l.is_monitor_report || l.is_range_limit || l.is_flow_limit ? "—"
                                   : <strong>{l.monthly_avg_loading ?? "—"}</strong>}
                               </td>
                               <td style={{...s.td, textAlign:"center"}}>{l.frequency_description ?? "—"}</td>
@@ -1741,7 +1741,7 @@ export default function AdminDashboard({ user, onLogout }: Props) {
                                       : <strong>{l.daily_max_concentration ?? "—"}</strong>}
                                   </td>
                                   <td style={{textAlign:"center"}}>
-                                    {l.is_monitor_report || l.is_flow_limit || l.daily_max_is_mr ? "—"
+                                    {l.is_monitor_report || l.is_flow_limit ? "—"
                                       : <strong>{l.daily_max_loading ?? "—"}</strong>}
                                   </td>
                                   <td style={{textAlign:"center"}}>
@@ -1749,7 +1749,7 @@ export default function AdminDashboard({ user, onLogout }: Props) {
                                       : l.weekly_max_is_mr ? <span style={s.mrBadge}>MR</span>
                                       : <strong>{l.weekly_max_concentration ?? "—"}</strong>}
                                   </td>
-                                  <td style={{textAlign:"center"}}>{l.is_monitor_report || l.is_range_limit || l.is_flow_limit || l.weekly_max_is_mr ? "—" : <strong>{l.weekly_max_loading ?? "—"}</strong>}</td>
+                                  <td style={{textAlign:"center"}}>{l.is_monitor_report || l.is_range_limit || l.is_flow_limit ? "—" : <strong>{l.weekly_max_loading ?? "—"}</strong>}</td>
                                   <td style={{textAlign:"center"}}>
                                     {l.is_monitor_report ? <span style={s.mrBadge}>MR</span>
                                       : l.is_range_limit ? "—"
@@ -1759,7 +1759,7 @@ export default function AdminDashboard({ user, onLogout }: Props) {
                                       : <strong>{l.monthly_avg_concentration ?? "—"}</strong>}
                                   </td>
                                   <td style={{textAlign:"center"}}>
-                                    {l.is_monitor_report || l.is_flow_limit || l.is_range_limit || l.monthly_avg_is_mr ? "—"
+                                    {l.is_monitor_report || l.is_flow_limit || l.is_range_limit ? "—"
                                       : <strong>{l.monthly_avg_loading ?? "—"}</strong>}
                                   </td>
                                   <td style={{textAlign:"center"}}>{l.frequency_description ?? "—"}</td>
