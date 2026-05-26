@@ -51,6 +51,7 @@ export interface PermitLimit {
   range_unit: string;
   weekly_max_concentration: number | null;
   weekly_max_loading: number | null;
+  weekly_max_is_mr: boolean;
   is_flow_limit: boolean;
   averaging_period: string | null;
   abbreviation: string | null;
