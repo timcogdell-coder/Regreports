@@ -12,7 +12,7 @@ NOTE: The source database has orphaned FK references in tbl_permit_limits:
   - limit_type_id value 25 not present in tbl_limit_type
 Placeholder rows are inserted for all of these; update names as needed.
 """
-from datetime import date, datetime
+from datetime import date
 
 from sqlalchemy import text
 
@@ -361,6 +361,7 @@ SURCHARGE_CALCULATIONS = [
 # ---------------------------------------------------------------------------
 # Seed
 # ---------------------------------------------------------------------------
+
 
 def _upsert(conn, stmt, rows):
     if rows:

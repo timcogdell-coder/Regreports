@@ -480,7 +480,7 @@ def monthly_report_pdf():
     from reportlab.lib.pagesizes import letter, landscape
     from reportlab.lib.units import inch
     from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.styles import ParagraphStyle
     from reportlab.lib.enums import TA_CENTER, TA_LEFT
     from sqlalchemy import func
 
@@ -561,7 +561,6 @@ def monthly_report_pdf():
                             leftMargin=0.5*inch, rightMargin=0.5*inch,
                             topMargin=0.5*inch, bottomMargin=0.5*inch)
 
-    styles  = getSampleStyleSheet()
     title_s = ParagraphStyle("title", fontSize=14, fontName="Helvetica-Bold", alignment=TA_CENTER, spaceAfter=4)
     sub_s   = ParagraphStyle("sub",   fontSize=10, fontName="Helvetica",      alignment=TA_CENTER, spaceAfter=2)
     cell_s  = ParagraphStyle("cell",  fontSize=7,  fontName="Helvetica",      alignment=TA_LEFT,   leading=9)

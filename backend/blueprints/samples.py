@@ -2,7 +2,7 @@ import calendar
 from datetime import datetime
 from flask import Blueprint, request, jsonify
 from flask_login import login_required, current_user
-from models import db, Sample, SampleResult, PermitLimit, Violation, Company, Permit, AuditLog, MonthlyFlowReport
+from models import db, Sample, SampleResult, PermitLimit, Violation, Company, Permit, AuditLog
 from engines.compliance_engine import check_compliance
 from engines.erg_engine import generate_enforcement_response
 from utils.decorators import roles_required
@@ -143,7 +143,6 @@ def get_sample(sample_id):
 
     # Period-level violations (avg/weekly — sample_id=NULL, scoped to this company/month).
     # Include them here so the review panel can show the full compliance picture.
-    from datetime import date as _date
     sd = sample.sample_date
     period_viols = (
         Violation.query
@@ -412,12 +411,12 @@ def get_corrections(sample_id):
             .order_by(AuditLog.timestamp.desc())
             .all())
     return jsonify([{
-        "id":        l.id,
-        "username":  l.user.username if l.user else "deleted user",
-        "action":    l.action,
-        "details":   l.details,
-        "timestamp": l.timestamp.isoformat() if l.timestamp else None,
-    } for l in logs]), 200
+        "id":        log.id,
+        "username":  log.user.username if log.user else "deleted user",
+        "action":    log.action,
+        "details":   log.details,
+        "timestamp": log.timestamp.isoformat() if log.timestamp else None,
+    } for log in logs]), 200
 
 
 @samples_bp.route("/<int:sample_id>/review", methods=["POST"])

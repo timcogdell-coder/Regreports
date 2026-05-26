@@ -2,7 +2,8 @@
 Run:  python debug_pdf.py "path/to/your.pdf"
 Prints raw extracted text and table contents to help tune the parser.
 """
-import sys, pdfplumber
+import sys
+import pdfplumber
 
 path = sys.argv[1] if len(sys.argv) > 1 else input("PDF path: ").strip()
 
@@ -11,7 +12,7 @@ with pdfplumber.open(path) as pdf:
 
 if not all_text.strip():
     print("No text layer — running OCR fallback...\n")
-    import os, pytesseract
+    import pytesseract
     from pdf2image import convert_from_path
 
     images = convert_from_path(path, dpi=300)

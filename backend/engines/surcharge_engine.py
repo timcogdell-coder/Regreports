@@ -21,7 +21,7 @@ Thresholds (ordinance):  BOD = 350 mg/L,  TSS = 300 mg/L
 """
 import calendar
 from flask import current_app
-from models import db, Sample, SampleResult, PermitLimit, Parameter, SurchargeCalculation, MonthlyFlowReport
+from models import db, Sample, SurchargeCalculation, MonthlyFlowReport
 
 
 def calculate_monthly_surcharge(company_id: int, month: int, year: int) -> dict:

@@ -400,6 +400,7 @@ def check_missing():
 # Parameters that use TRC factor 1.4 (BOD, TSS, Fats/Oil/Grease)
 _TRC_HIGH_KEYWORDS = {"bod", "cbod", "bods", "cbods", "tss", "fog", "oil", "grease", "fats"}
 
+
 def _trc_factor(param_name: str, abbreviation: str = "") -> float:
     """Return TRC factor: 1.4 for BOD/TSS/FOG, 1.2 for everything else."""
     combined = (param_name + " " + abbreviation).lower()

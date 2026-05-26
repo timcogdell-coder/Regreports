@@ -15,7 +15,7 @@ def expiring_permits():
     today = date.today()
     threshold = today + timedelta(days=90)
     permits = (Permit.query
-               .filter(Permit.is_active == True, Permit.expiration_date <= threshold)
+               .filter(Permit.is_active.is_(True), Permit.expiration_date <= threshold)
                .order_by(Permit.expiration_date.asc())
                .all())
     result = []
@@ -35,10 +35,10 @@ def list_permits():
     if current_user.role == "iu":
         permits = (Permit.query
                    .filter_by(company_id=current_user.company_id)
-                   .filter(Permit.is_active != False)
+                   .filter(Permit.is_active.isnot(False))
                    .all())
     else:
-        permits = Permit.query.filter(Permit.is_active != False).all()
+        permits = Permit.query.filter(Permit.is_active.isnot(False)).all()
     return jsonify([p.to_dict() for p in permits]), 200
 
 
@@ -75,35 +75,35 @@ def create_permit():
     # Copy limits from the superseded permit as a starting point
     if copy_from_id:
         source_limits = PermitLimit.query.filter_by(permit_id=copy_from_id).all()
-        for l in source_limits:
+        for lim in source_limits:
             db.session.add(PermitLimit(
                 permit_id                   = permit.id,
-                parameter_id                = l.parameter_id,
-                daily_max_concentration     = l.daily_max_concentration,
-                daily_max_loading           = l.daily_max_loading,
-                daily_min_concentration     = l.daily_min_concentration,
-                daily_min_loading           = l.daily_min_loading,
-                weekly_max_concentration    = l.weekly_max_concentration,
-                weekly_max_loading          = l.weekly_max_loading,
-                monthly_avg_concentration   = l.monthly_avg_concentration,
-                monthly_avg_loading         = l.monthly_avg_loading,
-                frequency_id                = l.frequency_id,
-                sample_type                 = l.sample_type,
-                is_monitor_report           = l.is_monitor_report,
-                daily_max_concentration_is_mr  = l.daily_max_concentration_is_mr,
-                daily_max_loading_is_mr        = l.daily_max_loading_is_mr,
-                daily_min_concentration_is_mr  = l.daily_min_concentration_is_mr,
-                daily_min_loading_is_mr        = l.daily_min_loading_is_mr,
-                weekly_max_concentration_is_mr = l.weekly_max_concentration_is_mr,
-                weekly_max_loading_is_mr       = l.weekly_max_loading_is_mr,
-                monthly_avg_concentration_is_mr= l.monthly_avg_concentration_is_mr,
-                monthly_avg_loading_is_mr      = l.monthly_avg_loading_is_mr,
-                is_range_limit              = l.is_range_limit,
-                min_value                   = l.min_value,
-                max_value                   = l.max_value,
-                range_unit                  = l.range_unit,
-                is_flow_limit               = l.is_flow_limit,
-                averaging_period            = l.averaging_period,
+                parameter_id                = lim.parameter_id,
+                daily_max_concentration     = lim.daily_max_concentration,
+                daily_max_loading           = lim.daily_max_loading,
+                daily_min_concentration     = lim.daily_min_concentration,
+                daily_min_loading           = lim.daily_min_loading,
+                weekly_max_concentration    = lim.weekly_max_concentration,
+                weekly_max_loading          = lim.weekly_max_loading,
+                monthly_avg_concentration   = lim.monthly_avg_concentration,
+                monthly_avg_loading         = lim.monthly_avg_loading,
+                frequency_id                = lim.frequency_id,
+                sample_type                 = lim.sample_type,
+                is_monitor_report           = lim.is_monitor_report,
+                daily_max_concentration_is_mr  = lim.daily_max_concentration_is_mr,
+                daily_max_loading_is_mr        = lim.daily_max_loading_is_mr,
+                daily_min_concentration_is_mr  = lim.daily_min_concentration_is_mr,
+                daily_min_loading_is_mr        = lim.daily_min_loading_is_mr,
+                weekly_max_concentration_is_mr = lim.weekly_max_concentration_is_mr,
+                weekly_max_loading_is_mr       = lim.weekly_max_loading_is_mr,
+                monthly_avg_concentration_is_mr= lim.monthly_avg_concentration_is_mr,
+                monthly_avg_loading_is_mr      = lim.monthly_avg_loading_is_mr,
+                is_range_limit              = lim.is_range_limit,
+                min_value                   = lim.min_value,
+                max_value                   = lim.max_value,
+                range_unit                  = lim.range_unit,
+                is_flow_limit               = lim.is_flow_limit,
+                averaging_period            = lim.averaging_period,
             ))
 
     company = Company.query.get(data["company_id"])
@@ -150,7 +150,7 @@ def update_permit(permit_id):
 def get_permit(permit_id):
     permit = Permit.query.get_or_404(permit_id)
     result = permit.to_dict()
-    result["limits"] = [l.to_dict() for l in permit.limits]
+    result["limits"] = [lim.to_dict() for lim in permit.limits]
     return jsonify(result), 200
 
 
@@ -257,7 +257,7 @@ def add_limits_batch(permit_id):
     )
     db.session.commit()
     return jsonify({
-        "created": [l.to_dict() for l in created],
+        "created": [lim.to_dict() for lim in created],
         "errors":  errors,
     }), 201
 

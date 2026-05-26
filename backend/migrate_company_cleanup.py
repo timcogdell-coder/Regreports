@@ -30,8 +30,6 @@ with app.app_context():
 
         # Hard delete Bush River WWTP (id=2) — no real data, safe to remove
         # Delete in FK order
-        from sqlalchemy import text as t
-
         # Get sample ids for company 2
         sample_ids = [r[0] for r in conn.execute(text(
             "SELECT id FROM tbl_sample WHERE company_id = 2"

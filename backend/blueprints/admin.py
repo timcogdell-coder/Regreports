@@ -136,7 +136,7 @@ def update_company(company_id):
 def company_dependents(company_id):
     Company.query.get_or_404(company_id)
     permit_ids = [p.id for p in Permit.query.filter_by(company_id=company_id).all()]
-    limit_ids  = [l.id for l in PermitLimit.query.filter(PermitLimit.permit_id.in_(permit_ids)).all()] if permit_ids else []
+    limit_ids  = [lim.id for lim in PermitLimit.query.filter(PermitLimit.permit_id.in_(permit_ids)).all()] if permit_ids else []
     return jsonify({
         "permits":         Permit.query.filter_by(company_id=company_id).count(),
         "samples":         Sample.query.filter_by(company_id=company_id).count(),
@@ -154,7 +154,7 @@ def company_dependents(company_id):
 def delete_company(company_id):
     company = Company.query.get_or_404(company_id)
     permit_ids = [p.id for p in Permit.query.filter_by(company_id=company_id).all()]
-    limit_ids  = [l.id for l in PermitLimit.query.filter(PermitLimit.permit_id.in_(permit_ids)).all()] if permit_ids else []
+    limit_ids  = [lim.id for lim in PermitLimit.query.filter(PermitLimit.permit_id.in_(permit_ids)).all()] if permit_ids else []
     sample_ids = [s.id for s in Sample.query.filter_by(company_id=company_id).all()]
 
     violation_ids = [v.id for v in Violation.query.filter_by(company_id=company_id).all()]
@@ -200,7 +200,7 @@ def list_audit_log():
     logs = (AuditLog.query
             .order_by(AuditLog.timestamp.desc())
             .limit(limit).offset(offset).all())
-    return jsonify([l.to_dict() for l in logs]), 200
+    return jsonify([log.to_dict() for log in logs]), 200
 
 
 @admin_bp.route("/parameters", methods=["GET"])
@@ -240,7 +240,6 @@ def list_frequencies():
     freqs = Frequency.query.order_by(Frequency.id).all()
     return jsonify([{"id": f.id, "frequency_code": f.frequency_code,
                      "description": f.description} for f in freqs]), 200
-
 
 
 @admin_bp.route("/meters", methods=["GET"])
@@ -312,7 +311,6 @@ def update_meter(meter_id):
 @admin_bp.route("/meters/readings", methods=["GET"])
 @login_required
 def list_meter_readings():
-    from flask_login import current_user
     company_id = request.args.get("company_id", type=int)
     if current_user.role == "iu":
         company_id = current_user.company_id
@@ -420,7 +418,6 @@ def delete_meter_reading(reading_id):
 @admin_bp.route("/meters/last-reading", methods=["GET"])
 @login_required
 def last_meter_reading():
-    from flask_login import current_user
     company_id  = request.args.get("company_id", type=int)
     meter_type  = request.args.get("meter_type", "process")
     if current_user.role == "iu":

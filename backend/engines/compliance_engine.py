@@ -4,7 +4,7 @@ Compares sample results against permit limits and records violations.
 """
 import calendar as _calendar
 from datetime import date, timedelta
-from models import db, Sample, SampleResult, PermitLimit, Violation, Parameter
+from models import db, Sample, SampleResult, PermitLimit, Violation
 
 
 def _exceedance_pct(measured: float, limit_val: float) -> float:
@@ -294,7 +294,7 @@ def check_missing_samples(company_id: int = None) -> list:
     flooding old inactive companies.
     """
     from sqlalchemy import func
-    from models import Permit, EnforcementHistory
+    from models import Permit
 
     today = date.today()
     new_violations = []

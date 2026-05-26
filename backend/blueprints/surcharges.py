@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_login import login_required, current_user
-from models import db, SurchargeCalculation
+from models import SurchargeCalculation
 from engines.surcharge_engine import calculate_monthly_surcharge
 from utils.decorators import roles_required
 
