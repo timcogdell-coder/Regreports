@@ -3098,6 +3098,11 @@ export default function AdminDashboard({ user, onLogout }: Props) {
                               : r.monthly_avg_concentration ? `${r.monthly_avg_concentration} mg/L` : "—";
                             const avgLimitLoadCell = r.is_monitor_report || r.is_range_limit || isFL ? "—"
                               : r.monthly_avg_loading ? `${r.monthly_avg_loading} lbs/d` : "—";
+                            const dailyMinCell = r.is_monitor_report || isFL || r.is_range_limit ? "—"
+                              : r.daily_min_is_mr ? "MR"
+                              : r.daily_min_concentration != null ? `${r.daily_min_concentration} mg/L`
+                              : r.daily_min_loading != null ? `${r.daily_min_loading} lbs/d`
+                              : "—";
                             const anyExc = r.exceedance_count > 0 || r.avg_conc_exceeds || r.avg_load_exceeds;
                             const sampledCell = isFL
                               ? (r.sample_count === 1 ? "✓ Report" : r.flow_report_status === "pending" ? "Pending" : "No Report")
@@ -3112,6 +3117,7 @@ export default function AdminDashboard({ user, onLogout }: Props) {
                               <td style="color:${r.avg_conc_exceeds?"#c53030":"inherit"};font-weight:${r.avg_conc_exceeds?700:400}">${isFL ? fmtMGD(r.avg_measured_conc) : fmt2(r.avg_measured_conc)}</td>
                               <td>${isFL ? "—" : fmt2(r.max_measured)}</td>
                               <td>${limitCell}</td>
+                              <td>${dailyMinCell}</td>
                               <td>${weeklyLimitCell}</td>
                               <td style="color:${r.avg_conc_exceeds?"#c53030":"inherit"};font-weight:${r.avg_conc_exceeds?700:400}">${r.is_monitor_report||r.is_range_limit?"—":isFL?fmtMGD(r.avg_measured_conc):fmt2(r.avg_measured_conc)}</td>
                               <td style="color:${r.avg_load_exceeds?"#c53030":"inherit"};font-weight:${r.avg_load_exceeds?700:400}">${r.is_monitor_report||r.is_range_limit||isFL?"—":r.avg_measured_load!=null?Math.round(r.avg_measured_load):"—"}</td>
@@ -3137,7 +3143,7 @@ export default function AdminDashboard({ user, onLogout }: Props) {
                               <th>Parameter</th><th>Frequency</th><th>Sample Type</th>
                               <th># Sampled</th><th>No. Exceeds</th>
                               <th>Min</th><th>Avg (mg/L)</th><th>Max (mg/L)</th>
-                              <th>Daily Limit</th><th>Weekly Limit</th>
+                              <th>Daily Max Limit</th><th>Daily Min Limit</th><th>Weekly Limit</th>
                               <th>Mo. Avg (mg/L)</th><th>Mo. Avg (lbs/d)</th>
                               <th>Mo. Avg Limit (mg/L)</th><th>Mo. Avg Limit (lbs/d)</th>
                             </tr></thead><tbody>${trs}</tbody></table>
@@ -3197,7 +3203,8 @@ export default function AdminDashboard({ user, onLogout }: Props) {
                             <th style={s.th}>Min</th>
                             <th style={s.th}>Avg<br/>(mg/L)</th>
                             <th style={s.th}>Max<br/>(mg/L)</th>
-                            <th style={s.th}>Daily Limit</th>
+                            <th style={s.th}>Daily Max<br/>Limit</th>
+                            <th style={s.th}>Daily Min<br/>Limit</th>
                             <th style={s.th}>Weekly Limit</th>
                             <th style={s.th}>Mo. Avg<br/>(mg/L)</th>
                             <th style={s.th}>Mo. Avg<br/>(lbs/d)</th>
@@ -3269,6 +3276,15 @@ export default function AdminDashboard({ user, onLogout }: Props) {
                                     </td>
                                     <td style={s.td}>{dailyLimitCell}</td>
                                     <td style={s.td}>
+                                      {r.is_monitor_report || isFlowLimit || r.is_range_limit ? "—"
+                                        : r.daily_min_is_mr ? <span style={s.mrBadge}>MR</span>
+                                        : r.daily_min_concentration != null
+                                          ? `${r.daily_min_concentration} mg/L`
+                                          : r.daily_min_loading != null
+                                            ? `${r.daily_min_loading} lbs/d`
+                                            : "—"}
+                                    </td>
+                                    <td style={s.td}>
                                       {r.is_monitor_report || r.is_range_limit || isFlowLimit ? "—"
                                         : [r.weekly_max_concentration ? `${r.weekly_max_concentration} mg/L` : null,
                                            r.weekly_max_loading       ? `${r.weekly_max_loading} lbs/d`       : null]
@@ -3298,7 +3314,7 @@ export default function AdminDashboard({ user, onLogout }: Props) {
                                   </tr>
                                   {isDrillOpen && (
                                     <tr key={`drill-${i}`}>
-                                      <td colSpan={13} style={{padding:0, background:"#fffaf0", borderBottom:"2px solid #f6ad55"}}>
+                                      <td colSpan={14} style={{padding:0, background:"#fffaf0", borderBottom:"2px solid #f6ad55"}}>
                                         <div style={{padding:"10px 16px"}}>
                                           <strong style={{fontSize:13, color:"#744210"}}>⚠ Exceedance Detail — {r.parameter_name} ({periodLabel})</strong>
                                           <table style={{width:"100%", borderCollapse:"collapse" as const, marginTop:8, fontSize:12}}>

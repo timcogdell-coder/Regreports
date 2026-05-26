@@ -255,6 +255,9 @@ def monthly_report():
                 "max_value":                 None,
                 "daily_max_concentration":   pl.daily_max_concentration,
                 "daily_max_loading":         None,
+                "daily_min_concentration":   None,
+                "daily_min_loading":         None,
+                "daily_min_is_mr":           False,
                 "weekly_max_concentration":  pl.weekly_max_concentration,
                 "weekly_max_loading":        None,
                 "monthly_avg_concentration": pl.monthly_avg_concentration,
@@ -307,6 +310,9 @@ def monthly_report():
             "max_value":                 pl.max_value,
             "daily_max_concentration":   pl.daily_max_concentration,
             "daily_max_loading":         pl.daily_max_loading,
+            "daily_min_concentration":   pl.daily_min_concentration,
+            "daily_min_loading":         pl.daily_min_loading,
+            "daily_min_is_mr":           pl.daily_min_is_mr   or False,
             "weekly_max_concentration":  pl.weekly_max_concentration,
             "weekly_max_loading":        pl.weekly_max_loading,
             "monthly_avg_concentration": pl.monthly_avg_concentration,
@@ -549,6 +555,7 @@ def monthly_report_pdf():
     col_headers = [
         "Parameter", "Freq.", "Samples\nTaken",
         "Daily Max\nLimit (mg/L)", "Daily Max\nLimit (lbs/d)",
+        "Daily Min\nLimit (mg/L)",
         "Mo. Avg\nLimit (mg/L)", "Mo. Avg\nLimit (lbs/d)",
         "Min\nMeasured", "Max\nMeasured",
         "Avg\nConc (mg/L)", "Avg\nLoad (lbs/d)",
@@ -610,7 +617,7 @@ def monthly_report_pdf():
                 Paragraph(f"{param.name if param else 'Unknown'} (MGD)", cell_s),
                 freq.frequency_code if freq else "—",
                 sampled_cell,
-                d_lim_c, "—",
+                d_lim_c, "—", "—",
                 mo_lim_c, "—",
                 "—", "—",
                 _fmt(measured) if measured is not None else "—", "—",
@@ -648,15 +655,16 @@ def monthly_report_pdf():
             exc_rows.add(i)
 
         if pl.is_monitor_report:
-            d_lim_c, d_lim_l, mo_lim_c, mo_lim_l = "MR", "MR", "MR", "MR"
+            d_lim_c, d_lim_l, d_min_c, mo_lim_c, mo_lim_l = "MR", "MR", "MR", "MR", "MR"
         elif pl.is_range_limit:
             mn = pl.min_value if pl.min_value is not None else "—"
             mx = pl.max_value if pl.max_value is not None else "—"
             d_lim_c = f"{mn}–{mx}"
-            d_lim_l, mo_lim_c, mo_lim_l = "—", "—", "—"
+            d_lim_l, d_min_c, mo_lim_c, mo_lim_l = "—", "—", "—", "—"
         else:
             d_lim_c  = _fmt(pl.daily_max_concentration)
             d_lim_l  = _fmt(pl.daily_max_loading)
+            d_min_c  = "MR" if pl.daily_min_is_mr else _fmt(pl.daily_min_concentration)
             mo_lim_c = _fmt(pl.monthly_avg_concentration)
             mo_lim_l = _fmt(pl.monthly_avg_loading)
 
@@ -666,7 +674,7 @@ def monthly_report_pdf():
             Paragraph(param.name if param else "Unknown", cell_s),
             freq.frequency_code if freq else "—",
             str(n),
-            d_lim_c, d_lim_l,
+            d_lim_c, d_lim_l, d_min_c,
             mo_lim_c, mo_lim_l,
             _fmt(min(conc_vals)) if conc_vals else "—",
             _fmt(max(conc_vals)) if conc_vals else "—",
@@ -675,10 +683,11 @@ def monthly_report_pdf():
             status,
         ])
 
-    col_widths_pdf = [1.4*inch, 0.5*inch, 0.55*inch,
-                      0.85*inch, 0.85*inch, 0.85*inch, 0.85*inch,
-                      0.7*inch, 0.7*inch, 0.8*inch, 0.8*inch,
-                      0.65*inch, 0.9*inch]
+    col_widths_pdf = [1.3*inch, 0.45*inch, 0.5*inch,
+                      0.78*inch, 0.72*inch, 0.72*inch,
+                      0.78*inch, 0.72*inch,
+                      0.65*inch, 0.65*inch, 0.72*inch, 0.72*inch,
+                      0.6*inch, 0.79*inch]
 
     tbl = Table(table_data, colWidths=col_widths_pdf, repeatRows=1)
     style_cmds = [
