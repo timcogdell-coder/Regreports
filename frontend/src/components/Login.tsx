@@ -29,11 +29,11 @@ export default function Login({ onLogin }: Props) {
         <h1 style={s.title}>Regreports PIMS</h1>
         <p style={s.sub}>Pretreatment Information Management System</p>
         <form onSubmit={handleSubmit}>
-          <label style={s.label}>Username</label>
-          <input style={s.input} value={username}
+          <label style={s.label} htmlFor="username">Username</label>
+          <input id="username" style={s.input} value={username}
             onChange={e => setUsername(e.target.value)} autoFocus required />
-          <label style={s.label}>Password</label>
-          <input style={s.input} type="password" value={password}
+          <label style={s.label} htmlFor="password">Password</label>
+          <input id="password" style={s.input} type="password" value={password}
             onChange={e => setPassword(e.target.value)} required />
           {error && <p style={s.error}>{error}</p>}
           <button style={s.btn} type="submit" disabled={loading}>
