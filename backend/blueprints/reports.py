@@ -385,8 +385,12 @@ def sample_report_excel():
 
     headers = [
         "Monitoring Period", "Company", "Permit No.", "Sample Date",
-        "Sampler", "Flow (MGD)", "Parameter", "Result (mg/L)",
-        "Loading (lbs/d)", "Daily Limit (mg/L)", "Daily Limit (lbs/d)", "Status"
+        "Sampler", "Flow (MGD)", "Parameter", "Result (mg/L)", "Loading (lbs/d)",
+        "Daily Max (mg/L)", "Daily Max (lbs/d)",
+        "Daily Min (mg/L)", "Daily Min (lbs/d)",
+        "Weekly Max (mg/L)", "Weekly Max (lbs/d)",
+        "Mo. Avg (mg/L)", "Mo. Avg (lbs/d)",
+        "Status"
     ]
     ws.append(headers)
     for col, _ in enumerate(headers, 1):
@@ -395,6 +399,10 @@ def sample_report_excel():
         cell.fill      = hdr_fill
         cell.alignment = center
         cell.border    = border
+
+    def _mr_or_val(is_mr, val):
+        """Return 'MR' when the MR flag is set, otherwise the numeric value (or None → blank)."""
+        return "MR" if is_mr else val
 
     for sr, s, pl, p, c, permit in rows:
         if pl.is_monitor_report:
@@ -412,7 +420,15 @@ def sample_report_excel():
                 (pl.daily_max_concentration is not None and sr.concentration_result is not None and sr.concentration_result > pl.daily_max_concentration) or
                 (pl.daily_max_loading       is not None and sr.loading_result       is not None and sr.loading_result       > pl.daily_max_loading)
             )
-            status = "Exceedance" if exceeds else "Pass"
+            below_min = not (pl.daily_min_is_mr or False) and (
+                (pl.daily_min_concentration is not None and sr.concentration_result is not None and sr.concentration_result < pl.daily_min_concentration) or
+                (pl.daily_min_loading       is not None and sr.loading_result       is not None and sr.loading_result       < pl.daily_min_loading)
+            )
+            status = "Exceedance" if (exceeds or below_min) else "Pass"
+
+        daily_min_mr  = pl.daily_min_is_mr  or False
+        weekly_mr     = pl.weekly_max_is_mr or False
+        monthly_mr    = pl.monthly_avg_is_mr or False
 
         ws.append([
             s.sample_date.strftime("%B %Y"),
@@ -426,6 +442,12 @@ def sample_report_excel():
             sr.loading_result,
             pl.daily_max_concentration,
             pl.daily_max_loading,
+            _mr_or_val(daily_min_mr, pl.daily_min_concentration),
+            _mr_or_val(daily_min_mr, pl.daily_min_loading),
+            _mr_or_val(weekly_mr,    pl.weekly_max_concentration),
+            _mr_or_val(weekly_mr,    pl.weekly_max_loading),
+            _mr_or_val(monthly_mr,   pl.monthly_avg_concentration),
+            _mr_or_val(monthly_mr,   pl.monthly_avg_loading),
             status,
         ])
         row_idx = ws.max_row
@@ -436,7 +458,7 @@ def sample_report_excel():
             if is_exc:
                 cell.fill = exc_fill
 
-    col_widths = [16, 22, 14, 13, 18, 11, 20, 14, 14, 18, 18, 12]
+    col_widths = [16, 22, 14, 13, 18, 11, 20, 14, 14, 16, 16, 16, 16, 16, 16, 16, 16, 12]
     for i, w in enumerate(col_widths, 1):
         ws.column_dimensions[get_column_letter(i)].width = w
 
