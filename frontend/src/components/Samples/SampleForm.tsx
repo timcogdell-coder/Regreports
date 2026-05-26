@@ -393,11 +393,12 @@ export default function SampleForm({ companyId, companyName, onSubmitted }: Prop
                 limitHintText = <span style={s.mrHint}>Monitor Report — no numeric limit</span>;
               } else if (limit.is_range_limit) {
                 limitHintText = <span style={s.limitHint}>{limit.min_value}–{limit.max_value} {limit.range_unit}{limit.daily_max_loading != null ? ` / ${limit.daily_max_loading} lbs/d max` : ""}</span>;
-              } else if (limit.daily_min_concentration != null || limit.daily_max_concentration != null || limit.weekly_max_concentration != null) {
+              } else if (limit.daily_min_concentration != null || limit.daily_max_concentration != null || limit.weekly_max_concentration != null || limit.monthly_avg_concentration != null) {
                 const parts: string[] = [];
                 if (limit.daily_min_concentration != null) parts.push(`Min ${limit.daily_min_concentration} mg/L`);
                 if (limit.daily_max_concentration != null) parts.push(`Max ${limit.daily_max_concentration} mg/L`);
                 if (limit.weekly_max_concentration != null && !limit.weekly_max_is_mr) parts.push(`Wkly max ${limit.weekly_max_concentration} mg/L`);
+                if (limit.monthly_avg_concentration != null && !limit.monthly_avg_is_mr) parts.push(`Mo. avg ${limit.monthly_avg_concentration} mg/L`);
                 limitHintText = <span style={s.limitHint}>{parts.join(" / ")}</span>;
               } else if (limit.daily_max_loading) {
                 limitHintText = <span style={s.limitHint}>Loading limit {limit.daily_max_loading} lbs/day</span>;

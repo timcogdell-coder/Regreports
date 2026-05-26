@@ -36,11 +36,13 @@ export interface PermitLimit {
   parameter_name: string;
   daily_max_concentration: number | null;
   daily_max_loading: number | null;
+  daily_max_is_mr: boolean;
   daily_min_concentration: number | null;
   daily_min_loading: number | null;
   daily_min_is_mr: boolean;
   monthly_avg_concentration: number | null;
   monthly_avg_loading: number | null;
+  monthly_avg_is_mr: boolean;
   frequency_id: number | null;
   frequency_description: string | null;
   sample_type: string | null;
