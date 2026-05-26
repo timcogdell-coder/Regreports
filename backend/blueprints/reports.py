@@ -257,7 +257,8 @@ def monthly_report():
                 "daily_max_loading":         None,
                 "daily_min_concentration":   None,
                 "daily_min_loading":         None,
-                "daily_min_is_mr":           False,
+                "daily_min_concentration_is_mr": False,
+            "daily_min_loading_is_mr":       False,
                 "weekly_max_concentration":  pl.weekly_max_concentration,
                 "weekly_max_loading":        None,
                 "monthly_avg_concentration": pl.monthly_avg_concentration,
@@ -312,7 +313,8 @@ def monthly_report():
             "daily_max_loading":         pl.daily_max_loading,
             "daily_min_concentration":   pl.daily_min_concentration,
             "daily_min_loading":         pl.daily_min_loading,
-            "daily_min_is_mr":           pl.daily_min_is_mr   or False,
+            "daily_min_concentration_is_mr": pl.daily_min_concentration_is_mr or False,
+            "daily_min_loading_is_mr":       pl.daily_min_loading_is_mr       or False,
             "weekly_max_concentration":  pl.weekly_max_concentration,
             "weekly_max_loading":        pl.weekly_max_loading,
             "monthly_avg_concentration": pl.monthly_avg_concentration,
@@ -417,18 +419,14 @@ def sample_report_excel():
                 status = "—"
         else:
             exceeds = (
-                (pl.daily_max_concentration is not None and sr.concentration_result is not None and sr.concentration_result > pl.daily_max_concentration) or
-                (pl.daily_max_loading       is not None and sr.loading_result       is not None and sr.loading_result       > pl.daily_max_loading)
+                (not (pl.daily_max_concentration_is_mr or False) and pl.daily_max_concentration is not None and sr.concentration_result is not None and sr.concentration_result > pl.daily_max_concentration) or
+                (not (pl.daily_max_loading_is_mr        or False) and pl.daily_max_loading       is not None and sr.loading_result       is not None and sr.loading_result       > pl.daily_max_loading)
             )
-            below_min = not (pl.daily_min_is_mr or False) and (
-                (pl.daily_min_concentration is not None and sr.concentration_result is not None and sr.concentration_result < pl.daily_min_concentration) or
-                (pl.daily_min_loading       is not None and sr.loading_result       is not None and sr.loading_result       < pl.daily_min_loading)
+            below_min = (
+                (not (pl.daily_min_concentration_is_mr or False) and pl.daily_min_concentration is not None and sr.concentration_result is not None and sr.concentration_result < pl.daily_min_concentration) or
+                (not (pl.daily_min_loading_is_mr        or False) and pl.daily_min_loading       is not None and sr.loading_result       is not None and sr.loading_result       < pl.daily_min_loading)
             )
             status = "Exceedance" if (exceeds or below_min) else "Pass"
-
-        daily_min_mr  = pl.daily_min_is_mr  or False
-        weekly_mr     = pl.weekly_max_is_mr or False
-        monthly_mr    = pl.monthly_avg_is_mr or False
 
         ws.append([
             s.sample_date.strftime("%B %Y"),
@@ -440,14 +438,14 @@ def sample_report_excel():
             p.name,
             sr.concentration_result,
             sr.loading_result,
-            pl.daily_max_concentration,
-            pl.daily_max_loading,
-            _mr_or_val(daily_min_mr, pl.daily_min_concentration),
-            _mr_or_val(daily_min_mr, pl.daily_min_loading),
-            _mr_or_val(weekly_mr,    pl.weekly_max_concentration),
-            _mr_or_val(weekly_mr,    pl.weekly_max_loading),
-            _mr_or_val(monthly_mr,   pl.monthly_avg_concentration),
-            _mr_or_val(monthly_mr,   pl.monthly_avg_loading),
+            _mr_or_val(pl.daily_max_concentration_is_mr or False, pl.daily_max_concentration),
+            _mr_or_val(pl.daily_max_loading_is_mr        or False, pl.daily_max_loading),
+            _mr_or_val(pl.daily_min_concentration_is_mr  or False, pl.daily_min_concentration),
+            _mr_or_val(pl.daily_min_loading_is_mr        or False, pl.daily_min_loading),
+            _mr_or_val(pl.weekly_max_concentration_is_mr or False, pl.weekly_max_concentration),
+            _mr_or_val(pl.weekly_max_loading_is_mr       or False, pl.weekly_max_loading),
+            _mr_or_val(pl.monthly_avg_concentration_is_mr or False, pl.monthly_avg_concentration),
+            _mr_or_val(pl.monthly_avg_loading_is_mr       or False, pl.monthly_avg_loading),
             status,
         ])
         row_idx = ws.max_row
@@ -683,8 +681,8 @@ def monthly_report_pdf():
         else:
             d_lim_c  = _fmt(pl.daily_max_concentration)
             d_lim_l  = _fmt(pl.daily_max_loading)
-            d_min_c  = "MR" if pl.daily_min_is_mr  else _fmt(pl.daily_min_concentration)
-            wk_max_c = "MR" if pl.weekly_max_is_mr else _fmt(pl.weekly_max_concentration)
+            d_min_c  = "MR" if (pl.daily_min_concentration_is_mr  or False) else _fmt(pl.daily_min_concentration)
+            wk_max_c = "MR" if (pl.weekly_max_concentration_is_mr or False) else _fmt(pl.weekly_max_concentration)
             mo_lim_c = _fmt(pl.monthly_avg_concentration)
             mo_lim_l = _fmt(pl.monthly_avg_loading)
 

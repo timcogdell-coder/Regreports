@@ -459,9 +459,10 @@ export default function IUDashboard({ user, onLogout, initialTab }: Props) {
                       <td style={{...s.td, textTransform:"capitalize"}}>{l.sample_type ?? "—"}</td>
                       <td style={s.td}>
                         {l.is_monitor_report || l.is_range_limit || l.is_flow_limit ? "—"
-                          : l.daily_min_is_mr ? <span style={s.mrBadge}>MR</span>
+                          : l.daily_min_concentration_is_mr ? <span style={s.mrBadge}>MR</span>
                           : l.daily_min_concentration != null
                             ? `${l.daily_min_concentration} mg/L`
+                            : l.daily_min_loading_is_mr ? <span style={s.mrBadge}>MR</span>
                             : l.daily_min_loading != null
                               ? `${l.daily_min_loading} lbs/day`
                               : "—"}
@@ -472,27 +473,30 @@ export default function IUDashboard({ user, onLogout, initialTab }: Props) {
                           : l.is_range_limit
                             ? <span style={s.rangeBadge}>{l.min_value ?? "—"}–{l.max_value ?? "—"} {l.range_unit ?? "s.u."}</span>
                             : l.is_flow_limit ? "—"
-                            : l.daily_max_is_mr ? <span style={s.mrBadge}>MR</span>
+                            : l.daily_max_concentration_is_mr ? <span style={s.mrBadge}>MR</span>
                             : l.daily_max_concentration != null
                               ? `${l.daily_max_concentration} mg/L`
+                              : l.daily_max_loading_is_mr ? <span style={s.mrBadge}>MR</span>
                               : l.daily_max_loading != null
                                 ? `${l.daily_max_loading} lbs/day`
                                 : "—"}
                       </td>
                       <td style={s.td}>
                         {l.is_monitor_report || l.is_range_limit || l.is_flow_limit ? "—"
-                          : l.weekly_max_is_mr ? <span style={s.mrBadge}>MR</span>
+                          : l.weekly_max_concentration_is_mr ? <span style={s.mrBadge}>MR</span>
                           : l.weekly_max_concentration != null
                             ? `${l.weekly_max_concentration} mg/L`
+                            : l.weekly_max_loading_is_mr ? <span style={s.mrBadge}>MR</span>
                             : l.weekly_max_loading != null
                               ? `${l.weekly_max_loading} lbs/day`
                               : "—"}
                       </td>
                       <td style={s.td}>
                         {l.is_monitor_report || l.is_range_limit || l.is_flow_limit ? "—"
-                          : l.monthly_avg_is_mr ? <span style={s.mrBadge}>MR</span>
+                          : l.monthly_avg_concentration_is_mr ? <span style={s.mrBadge}>MR</span>
                           : l.monthly_avg_concentration != null
                             ? `${l.monthly_avg_concentration} mg/L`
+                            : l.monthly_avg_loading_is_mr ? <span style={s.mrBadge}>MR</span>
                             : l.monthly_avg_loading != null
                               ? `${l.monthly_avg_loading} lbs/day`
                               : "—"}

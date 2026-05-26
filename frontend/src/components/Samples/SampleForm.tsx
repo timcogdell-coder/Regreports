@@ -397,8 +397,8 @@ export default function SampleForm({ companyId, companyName, onSubmitted }: Prop
                 const parts: string[] = [];
                 if (limit.daily_min_concentration != null) parts.push(`Min ${limit.daily_min_concentration} mg/L`);
                 if (limit.daily_max_concentration != null) parts.push(`Max ${limit.daily_max_concentration} mg/L`);
-                if (limit.weekly_max_concentration != null && !limit.weekly_max_is_mr) parts.push(`Wkly max ${limit.weekly_max_concentration} mg/L`);
-                if (limit.monthly_avg_concentration != null && !limit.monthly_avg_is_mr) parts.push(`Mo. avg ${limit.monthly_avg_concentration} mg/L`);
+                if (limit.weekly_max_concentration != null && !limit.weekly_max_concentration_is_mr) parts.push(`Wkly max ${limit.weekly_max_concentration} mg/L`);
+                if (limit.monthly_avg_concentration != null && !limit.monthly_avg_concentration_is_mr) parts.push(`Mo. avg ${limit.monthly_avg_concentration} mg/L`);
                 limitHintText = <span style={s.limitHint}>{parts.join(" / ")}</span>;
               } else if (limit.daily_max_loading) {
                 limitHintText = <span style={s.limitHint}>Loading limit {limit.daily_max_loading} lbs/day</span>;

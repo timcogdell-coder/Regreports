@@ -90,10 +90,14 @@ def create_permit():
                 frequency_id                = l.frequency_id,
                 sample_type                 = l.sample_type,
                 is_monitor_report           = l.is_monitor_report,
-                daily_max_is_mr             = l.daily_max_is_mr,
-                daily_min_is_mr             = l.daily_min_is_mr,
-                weekly_max_is_mr            = l.weekly_max_is_mr,
-                monthly_avg_is_mr           = l.monthly_avg_is_mr,
+                daily_max_concentration_is_mr  = l.daily_max_concentration_is_mr,
+                daily_max_loading_is_mr        = l.daily_max_loading_is_mr,
+                daily_min_concentration_is_mr  = l.daily_min_concentration_is_mr,
+                daily_min_loading_is_mr        = l.daily_min_loading_is_mr,
+                weekly_max_concentration_is_mr = l.weekly_max_concentration_is_mr,
+                weekly_max_loading_is_mr       = l.weekly_max_loading_is_mr,
+                monthly_avg_concentration_is_mr= l.monthly_avg_concentration_is_mr,
+                monthly_avg_loading_is_mr      = l.monthly_avg_loading_is_mr,
                 is_range_limit              = l.is_range_limit,
                 min_value                   = l.min_value,
                 max_value                   = l.max_value,
@@ -171,17 +175,21 @@ def add_limit(permit_id):
         frequency_id                = data.get("frequency_id"),
         limit_type_id               = data.get("limit_type_id"),
         sample_type                 = data.get("sample_type"),
-        is_monitor_report           = bool(data.get("is_monitor_report", False)),
-        daily_max_is_mr             = bool(data.get("daily_max_is_mr", False)),
-        daily_min_is_mr             = bool(data.get("daily_min_is_mr", False)),
-        weekly_max_is_mr            = bool(data.get("weekly_max_is_mr", False)),
-        monthly_avg_is_mr           = bool(data.get("monthly_avg_is_mr", False)),
-        is_range_limit              = bool(data.get("is_range_limit", False)),
-        min_value                   = data.get("min_value"),
-        max_value                   = data.get("max_value"),
-        range_unit                  = data.get("range_unit", "s.u."),
-        is_flow_limit               = bool(data.get("is_flow_limit", False)),
-        averaging_period            = data.get("averaging_period"),
+        is_monitor_report              = bool(data.get("is_monitor_report", False)),
+        daily_max_concentration_is_mr  = bool(data.get("daily_max_concentration_is_mr", False)),
+        daily_max_loading_is_mr        = bool(data.get("daily_max_loading_is_mr", False)),
+        daily_min_concentration_is_mr  = bool(data.get("daily_min_concentration_is_mr", False)),
+        daily_min_loading_is_mr        = bool(data.get("daily_min_loading_is_mr", False)),
+        weekly_max_concentration_is_mr = bool(data.get("weekly_max_concentration_is_mr", False)),
+        weekly_max_loading_is_mr       = bool(data.get("weekly_max_loading_is_mr", False)),
+        monthly_avg_concentration_is_mr= bool(data.get("monthly_avg_concentration_is_mr", False)),
+        monthly_avg_loading_is_mr      = bool(data.get("monthly_avg_loading_is_mr", False)),
+        is_range_limit                 = bool(data.get("is_range_limit", False)),
+        min_value                      = data.get("min_value"),
+        max_value                      = data.get("max_value"),
+        range_unit                     = data.get("range_unit", "s.u."),
+        is_flow_limit                  = bool(data.get("is_flow_limit", False)),
+        averaging_period               = data.get("averaging_period"),
     )
     db.session.add(limit)
     param_name = limit.parameter.name if limit.parameter else f"param {data['parameter_id']}"
@@ -222,17 +230,21 @@ def add_limits_batch(permit_id):
             monthly_avg_loading         = data.get("monthly_avg_loading"),
             frequency_id                = data.get("frequency_id"),
             sample_type                 = data.get("sample_type"),
-            is_monitor_report           = bool(data.get("is_monitor_report", False)),
-            daily_max_is_mr             = bool(data.get("daily_max_is_mr", False)),
-            daily_min_is_mr             = bool(data.get("daily_min_is_mr", False)),
-            weekly_max_is_mr            = bool(data.get("weekly_max_is_mr", False)),
-            monthly_avg_is_mr           = bool(data.get("monthly_avg_is_mr", False)),
-            is_range_limit              = bool(data.get("is_range_limit", False)),
-            min_value                   = data.get("min_value"),
-            max_value                   = data.get("max_value"),
-            range_unit                  = data.get("range_unit", "s.u."),
-            is_flow_limit               = bool(data.get("is_flow_limit", False)),
-            averaging_period            = data.get("averaging_period"),
+            is_monitor_report              = bool(data.get("is_monitor_report", False)),
+            daily_max_concentration_is_mr  = bool(data.get("daily_max_concentration_is_mr", False)),
+            daily_max_loading_is_mr        = bool(data.get("daily_max_loading_is_mr", False)),
+            daily_min_concentration_is_mr  = bool(data.get("daily_min_concentration_is_mr", False)),
+            daily_min_loading_is_mr        = bool(data.get("daily_min_loading_is_mr", False)),
+            weekly_max_concentration_is_mr = bool(data.get("weekly_max_concentration_is_mr", False)),
+            weekly_max_loading_is_mr       = bool(data.get("weekly_max_loading_is_mr", False)),
+            monthly_avg_concentration_is_mr= bool(data.get("monthly_avg_concentration_is_mr", False)),
+            monthly_avg_loading_is_mr      = bool(data.get("monthly_avg_loading_is_mr", False)),
+            is_range_limit                 = bool(data.get("is_range_limit", False)),
+            min_value                      = data.get("min_value"),
+            max_value                      = data.get("max_value"),
+            range_unit                     = data.get("range_unit", "s.u."),
+            is_flow_limit                  = bool(data.get("is_flow_limit", False)),
+            averaging_period               = data.get("averaging_period"),
         )
         db.session.add(limit)
         created.append(limit)
@@ -275,11 +287,15 @@ def update_limit(permit_id, limit_id):
     limit.monthly_avg_loading       = data.get("monthly_avg_loading",       limit.monthly_avg_loading)
     limit.frequency_id              = data.get("frequency_id",              limit.frequency_id)
     limit.sample_type               = data.get("sample_type",               limit.sample_type)
-    limit.is_monitor_report         = bool(data.get("is_monitor_report",    limit.is_monitor_report))
-    limit.daily_max_is_mr           = bool(data.get("daily_max_is_mr",      limit.daily_max_is_mr or False))
-    limit.daily_min_is_mr           = bool(data.get("daily_min_is_mr",      limit.daily_min_is_mr or False))
-    limit.weekly_max_is_mr          = bool(data.get("weekly_max_is_mr",     limit.weekly_max_is_mr or False))
-    limit.monthly_avg_is_mr         = bool(data.get("monthly_avg_is_mr",    limit.monthly_avg_is_mr or False))
+    limit.is_monitor_report              = bool(data.get("is_monitor_report",               limit.is_monitor_report))
+    limit.daily_max_concentration_is_mr  = bool(data.get("daily_max_concentration_is_mr",  limit.daily_max_concentration_is_mr  or False))
+    limit.daily_max_loading_is_mr        = bool(data.get("daily_max_loading_is_mr",        limit.daily_max_loading_is_mr        or False))
+    limit.daily_min_concentration_is_mr  = bool(data.get("daily_min_concentration_is_mr",  limit.daily_min_concentration_is_mr  or False))
+    limit.daily_min_loading_is_mr        = bool(data.get("daily_min_loading_is_mr",        limit.daily_min_loading_is_mr        or False))
+    limit.weekly_max_concentration_is_mr = bool(data.get("weekly_max_concentration_is_mr", limit.weekly_max_concentration_is_mr or False))
+    limit.weekly_max_loading_is_mr       = bool(data.get("weekly_max_loading_is_mr",       limit.weekly_max_loading_is_mr       or False))
+    limit.monthly_avg_concentration_is_mr= bool(data.get("monthly_avg_concentration_is_mr",limit.monthly_avg_concentration_is_mr or False))
+    limit.monthly_avg_loading_is_mr      = bool(data.get("monthly_avg_loading_is_mr",      limit.monthly_avg_loading_is_mr      or False))
     limit.is_range_limit            = bool(data.get("is_range_limit",        limit.is_range_limit))
     limit.min_value                 = data.get("min_value",                  limit.min_value)
     limit.max_value                 = data.get("max_value",                  limit.max_value)
@@ -291,13 +307,13 @@ def update_limit(permit_id, limit_id):
     # They are stale: the limit no longer exists, so the exceedance is no longer valid.
     # Any genuine loading-based avg_exceeds will be recreated on the next compliance run.
     stale_types = set()
-    if old_daily_max_conc  is not None and (limit.daily_max_concentration  is None or limit.daily_max_is_mr):
+    if old_daily_max_conc  is not None and (limit.daily_max_concentration  is None or limit.daily_max_concentration_is_mr):
         stale_types.add("max_exceeds")
-    if old_daily_min_conc  is not None and (limit.daily_min_concentration  is None or limit.daily_min_is_mr):
+    if old_daily_min_conc  is not None and (limit.daily_min_concentration  is None or limit.daily_min_concentration_is_mr):
         stale_types.add("below_min")
-    if old_weekly_max_conc is not None and (limit.weekly_max_concentration is None or limit.weekly_max_is_mr):
+    if old_weekly_max_conc is not None and (limit.weekly_max_concentration is None or limit.weekly_max_concentration_is_mr):
         stale_types.add("weekly_avg_exceeds")
-    if old_monthly_avg_conc is not None and (limit.monthly_avg_concentration is None or limit.monthly_avg_is_mr):
+    if old_monthly_avg_conc is not None and (limit.monthly_avg_concentration is None or limit.monthly_avg_concentration_is_mr):
         stale_types.add("avg_exceeds")
 
     if stale_types:

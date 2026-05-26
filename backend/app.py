@@ -65,12 +65,20 @@ def _migrate_columns():
         ("tbl_permit_limits",  "weekly_max_concentration", "FLOAT"),
         ("tbl_permit_limits",  "weekly_max_loading",       "FLOAT"),
         ("tbl_permit_limits",  "is_flow_limit",            "BOOLEAN DEFAULT FALSE"),
-        ("tbl_permit_limits",  "daily_max_is_mr",          "BOOLEAN DEFAULT FALSE"),
-        ("tbl_permit_limits",  "daily_min_concentration",  "FLOAT"),
-        ("tbl_permit_limits",  "daily_min_loading",        "FLOAT"),
-        ("tbl_permit_limits",  "daily_min_is_mr",          "BOOLEAN DEFAULT FALSE"),
-        ("tbl_permit_limits",  "weekly_max_is_mr",         "BOOLEAN DEFAULT FALSE"),
-        ("tbl_permit_limits",  "monthly_avg_is_mr",        "BOOLEAN DEFAULT FALSE"),
+        ("tbl_permit_limits",  "daily_max_is_mr",               "BOOLEAN DEFAULT FALSE"),  # legacy — superseded below
+        ("tbl_permit_limits",  "daily_min_concentration",       "FLOAT"),
+        ("tbl_permit_limits",  "daily_min_loading",             "FLOAT"),
+        ("tbl_permit_limits",  "daily_min_is_mr",               "BOOLEAN DEFAULT FALSE"),  # legacy
+        ("tbl_permit_limits",  "weekly_max_is_mr",              "BOOLEAN DEFAULT FALSE"),  # legacy
+        ("tbl_permit_limits",  "monthly_avg_is_mr",             "BOOLEAN DEFAULT FALSE"),  # legacy
+        ("tbl_permit_limits",  "daily_max_concentration_is_mr",  "BOOLEAN DEFAULT FALSE"),
+        ("tbl_permit_limits",  "daily_max_loading_is_mr",        "BOOLEAN DEFAULT FALSE"),
+        ("tbl_permit_limits",  "daily_min_concentration_is_mr",  "BOOLEAN DEFAULT FALSE"),
+        ("tbl_permit_limits",  "daily_min_loading_is_mr",        "BOOLEAN DEFAULT FALSE"),
+        ("tbl_permit_limits",  "weekly_max_concentration_is_mr", "BOOLEAN DEFAULT FALSE"),
+        ("tbl_permit_limits",  "weekly_max_loading_is_mr",       "BOOLEAN DEFAULT FALSE"),
+        ("tbl_permit_limits",  "monthly_avg_concentration_is_mr","BOOLEAN DEFAULT FALSE"),
+        ("tbl_permit_limits",  "monthly_avg_loading_is_mr",      "BOOLEAN DEFAULT FALSE"),
         ("tbl_meter_readings",       "reading_purpose",  "VARCHAR(20) NOT NULL DEFAULT 'monthly'"),
         ("tbl_meter_readings",       "sample_id",        "INTEGER REFERENCES tbl_sample(id)"),
         ("tbl_monthly_flow_reports", "review_status",      "VARCHAR(20) NOT NULL DEFAULT 'pending'"),
@@ -117,6 +125,28 @@ def _migrate_columns():
                 conn.commit()
             except Exception:
                 conn.rollback()   # required for PostgreSQL — clears aborted-tx state
+
+    # Migrate legacy single is_mr flags to per-column split flags where not yet set.
+    with db.engine.connect() as conn:
+        try:
+            conn.execute(db.text("""
+                UPDATE tbl_permit_limits SET
+                    daily_max_concentration_is_mr  = COALESCE(daily_max_concentration_is_mr,  daily_max_is_mr,  FALSE),
+                    daily_max_loading_is_mr        = COALESCE(daily_max_loading_is_mr,        FALSE),
+                    daily_min_concentration_is_mr  = COALESCE(daily_min_concentration_is_mr,  daily_min_is_mr,  FALSE),
+                    daily_min_loading_is_mr        = COALESCE(daily_min_loading_is_mr,        daily_min_is_mr,  FALSE),
+                    weekly_max_concentration_is_mr = COALESCE(weekly_max_concentration_is_mr, weekly_max_is_mr, FALSE),
+                    weekly_max_loading_is_mr       = COALESCE(weekly_max_loading_is_mr,       weekly_max_is_mr, FALSE),
+                    monthly_avg_concentration_is_mr= COALESCE(monthly_avg_concentration_is_mr,monthly_avg_is_mr,FALSE),
+                    monthly_avg_loading_is_mr      = COALESCE(monthly_avg_loading_is_mr,      FALSE)
+                WHERE daily_max_concentration_is_mr IS NULL
+                   OR daily_min_concentration_is_mr IS NULL
+                   OR weekly_max_concentration_is_mr IS NULL
+                   OR monthly_avg_concentration_is_mr IS NULL
+            """))
+            conn.commit()
+        except Exception:
+            conn.rollback()
 
 
 def _seed_reference_data():
