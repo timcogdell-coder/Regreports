@@ -381,7 +381,10 @@ export default function SampleForm({ companyId, companyName, onSubmitted }: Prop
                   status = val >= lo && val <= hi ? "range_ok" : "range_fail";
                 } else {
                   const maxC = limit.daily_max_concentration;
-                  status = maxC != null ? (val <= maxC ? "pass" : "fail") : "pass";
+                  const minC = limit.daily_min_concentration;
+                  if (maxC != null && val > maxC) status = "fail";
+                  else if (minC != null && val < minC) status = "fail";
+                  else status = "pass";
                 }
               }
 
@@ -390,8 +393,11 @@ export default function SampleForm({ companyId, companyName, onSubmitted }: Prop
                 limitHintText = <span style={s.mrHint}>Monitor Report — no numeric limit</span>;
               } else if (limit.is_range_limit) {
                 limitHintText = <span style={s.limitHint}>{limit.min_value}–{limit.max_value} {limit.range_unit}{limit.daily_max_loading != null ? ` / ${limit.daily_max_loading} lbs/d max` : ""}</span>;
-              } else if (limit.daily_max_concentration) {
-                limitHintText = <span style={s.limitHint}>Max {limit.daily_max_concentration} mg/L</span>;
+              } else if (limit.daily_min_concentration != null || limit.daily_max_concentration != null) {
+                const parts: string[] = [];
+                if (limit.daily_min_concentration != null) parts.push(`Min ${limit.daily_min_concentration} mg/L`);
+                if (limit.daily_max_concentration != null) parts.push(`Max ${limit.daily_max_concentration} mg/L`);
+                limitHintText = <span style={s.limitHint}>{parts.join(" / ")}</span>;
               } else if (limit.daily_max_loading) {
                 limitHintText = <span style={s.limitHint}>Loading limit {limit.daily_max_loading} lbs/day</span>;
               }

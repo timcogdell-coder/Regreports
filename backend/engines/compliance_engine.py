@@ -89,9 +89,10 @@ def _check_result(sample: Sample, result: SampleResult, limit: PermitLimit) -> l
         return violations
 
     # ── Standard max / average limits ───────────────────────────────────────
-    daily_mr   = limit.daily_max_is_mr   or False
-    weekly_mr  = limit.weekly_max_is_mr  or False
-    monthly_mr = limit.monthly_avg_is_mr or False
+    daily_mr     = limit.daily_max_is_mr   or False
+    daily_min_mr = limit.daily_min_is_mr   or False
+    weekly_mr    = limit.weekly_max_is_mr  or False
+    monthly_mr   = limit.monthly_avg_is_mr or False
 
     # daily_max_is_mr suppresses the concentration check only; loading is enforced independently.
     if not daily_mr:
@@ -104,6 +105,17 @@ def _check_result(sample: Sample, result: SampleResult, limit: PermitLimit) -> l
         if loading > limit.daily_max_loading:
             pct = _exceedance_pct(loading, limit.daily_max_loading)
             violations.append(_create_violation(sample, limit, result, "max_exceeds", pct))
+
+    # daily_min_is_mr suppresses enforcement; result is still reported.
+    if not daily_min_mr:
+        if conc is not None and limit.daily_min_concentration is not None:
+            if conc < limit.daily_min_concentration:
+                pct = _below_pct(conc, limit.daily_min_concentration)
+                violations.append(_create_violation(sample, limit, result, "below_min", pct))
+        if loading is not None and limit.daily_min_loading is not None:
+            if loading < limit.daily_min_loading:
+                pct = _below_pct(loading, limit.daily_min_loading)
+                violations.append(_create_violation(sample, limit, result, "below_min", pct))
 
     # Check weekly maximum concentration (7-day average, ISO Mon–Sun).
     # avg/weekly violations are period-level: sample_id is left NULL so they don't

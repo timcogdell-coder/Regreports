@@ -446,6 +446,7 @@ export default function IUDashboard({ user, onLogout, initialTab }: Props) {
                   <thead><tr>
                     <th style={s.th}>Parameter</th>
                     <th style={s.th}>Sample Type</th>
+                    <th style={s.th}>Daily Min</th>
                     <th style={s.th}>Daily Max</th>
                     <th style={s.th}>Monthly Avg</th>
                     <th style={s.th}>Frequency</th>
@@ -455,6 +456,15 @@ export default function IUDashboard({ user, onLogout, initialTab }: Props) {
                     <tr key={l.id}>
                       <td style={s.td}><strong>{l.parameter_name}</strong></td>
                       <td style={{...s.td, textTransform:"capitalize"}}>{l.sample_type ?? "—"}</td>
+                      <td style={s.td}>
+                        {l.is_monitor_report || l.is_range_limit || l.is_flow_limit ? "—"
+                          : l.daily_min_is_mr ? <span style={s.mrBadge}>MR</span>
+                          : l.daily_min_concentration != null
+                            ? `${l.daily_min_concentration} mg/L`
+                            : l.daily_min_loading != null
+                              ? `${l.daily_min_loading} lbs/day`
+                              : "—"}
+                      </td>
                       <td style={s.td}>
                         {l.is_monitor_report
                           ? <span style={s.mrBadge}>Monitor & Report</span>

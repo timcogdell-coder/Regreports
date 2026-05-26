@@ -143,6 +143,9 @@ class PermitLimit(db.Model):
     daily_max_is_mr             = db.Column(db.Boolean, default=False)  # daily max column is MR only
     weekly_max_is_mr            = db.Column(db.Boolean, default=False)  # weekly max column is MR only
     monthly_avg_is_mr           = db.Column(db.Boolean, default=False)  # monthly avg column is MR only
+    daily_min_concentration     = db.Column(db.Float)   # mg/L  (minimum required)
+    daily_min_loading           = db.Column(db.Float)   # lbs/day
+    daily_min_is_mr             = db.Column(db.Boolean, default=False)  # daily min column is MR only
     is_range_limit              = db.Column(db.Boolean, default=False)   # min/max range (e.g. pH)
     min_value                   = db.Column(db.Float)
     max_value                   = db.Column(db.Float)
@@ -160,6 +163,8 @@ class PermitLimit(db.Model):
                 "abbreviation": self.parameter.abbreviation if self.parameter else None,
                 "daily_max_concentration": self.daily_max_concentration,
                 "daily_max_loading": self.daily_max_loading,
+                "daily_min_concentration": self.daily_min_concentration,
+                "daily_min_loading": self.daily_min_loading,
                 "weekly_max_concentration": self.weekly_max_concentration,
                 "weekly_max_loading": self.weekly_max_loading,
                 "monthly_avg_concentration": self.monthly_avg_concentration,
@@ -169,6 +174,7 @@ class PermitLimit(db.Model):
                 "sample_type": self.sample_type,
                 "is_monitor_report": self.is_monitor_report or False,
                 "daily_max_is_mr": self.daily_max_is_mr or False,
+                "daily_min_is_mr": self.daily_min_is_mr or False,
                 "weekly_max_is_mr": self.weekly_max_is_mr or False,
                 "monthly_avg_is_mr": self.monthly_avg_is_mr or False,
                 "is_range_limit": self.is_range_limit or False,

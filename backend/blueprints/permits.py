@@ -81,6 +81,8 @@ def create_permit():
                 parameter_id                = l.parameter_id,
                 daily_max_concentration     = l.daily_max_concentration,
                 daily_max_loading           = l.daily_max_loading,
+                daily_min_concentration     = l.daily_min_concentration,
+                daily_min_loading           = l.daily_min_loading,
                 weekly_max_concentration    = l.weekly_max_concentration,
                 weekly_max_loading          = l.weekly_max_loading,
                 monthly_avg_concentration   = l.monthly_avg_concentration,
@@ -89,6 +91,7 @@ def create_permit():
                 sample_type                 = l.sample_type,
                 is_monitor_report           = l.is_monitor_report,
                 daily_max_is_mr             = l.daily_max_is_mr,
+                daily_min_is_mr             = l.daily_min_is_mr,
                 weekly_max_is_mr            = l.weekly_max_is_mr,
                 monthly_avg_is_mr           = l.monthly_avg_is_mr,
                 is_range_limit              = l.is_range_limit,
@@ -159,6 +162,8 @@ def add_limit(permit_id):
         parameter_id                = data["parameter_id"],
         daily_max_concentration     = data.get("daily_max_concentration"),
         daily_max_loading           = data.get("daily_max_loading"),
+        daily_min_concentration     = data.get("daily_min_concentration"),
+        daily_min_loading           = data.get("daily_min_loading"),
         weekly_max_concentration    = data.get("weekly_max_concentration"),
         weekly_max_loading          = data.get("weekly_max_loading"),
         monthly_avg_concentration   = data.get("monthly_avg_concentration"),
@@ -168,6 +173,7 @@ def add_limit(permit_id):
         sample_type                 = data.get("sample_type"),
         is_monitor_report           = bool(data.get("is_monitor_report", False)),
         daily_max_is_mr             = bool(data.get("daily_max_is_mr", False)),
+        daily_min_is_mr             = bool(data.get("daily_min_is_mr", False)),
         weekly_max_is_mr            = bool(data.get("weekly_max_is_mr", False)),
         monthly_avg_is_mr           = bool(data.get("monthly_avg_is_mr", False)),
         is_range_limit              = bool(data.get("is_range_limit", False)),
@@ -208,6 +214,8 @@ def add_limits_batch(permit_id):
             parameter_id                = data["parameter_id"],
             daily_max_concentration     = data.get("daily_max_concentration"),
             daily_max_loading           = data.get("daily_max_loading"),
+            daily_min_concentration     = data.get("daily_min_concentration"),
+            daily_min_loading           = data.get("daily_min_loading"),
             weekly_max_concentration    = data.get("weekly_max_concentration"),
             weekly_max_loading          = data.get("weekly_max_loading"),
             monthly_avg_concentration   = data.get("monthly_avg_concentration"),
@@ -216,6 +224,7 @@ def add_limits_batch(permit_id):
             sample_type                 = data.get("sample_type"),
             is_monitor_report           = bool(data.get("is_monitor_report", False)),
             daily_max_is_mr             = bool(data.get("daily_max_is_mr", False)),
+            daily_min_is_mr             = bool(data.get("daily_min_is_mr", False)),
             weekly_max_is_mr            = bool(data.get("weekly_max_is_mr", False)),
             monthly_avg_is_mr           = bool(data.get("monthly_avg_is_mr", False)),
             is_range_limit              = bool(data.get("is_range_limit", False)),
@@ -251,12 +260,15 @@ def update_limit(permit_id, limit_id):
 
     # Capture thresholds before update so we can detect removals
     old_daily_max_conc   = limit.daily_max_concentration
+    old_daily_min_conc   = limit.daily_min_concentration
     old_weekly_max_conc  = limit.weekly_max_concentration
     old_monthly_avg_conc = limit.monthly_avg_concentration
 
     limit.parameter_id              = data.get("parameter_id",              limit.parameter_id)
     limit.daily_max_concentration   = data.get("daily_max_concentration",   limit.daily_max_concentration)
     limit.daily_max_loading         = data.get("daily_max_loading",         limit.daily_max_loading)
+    limit.daily_min_concentration   = data.get("daily_min_concentration",   limit.daily_min_concentration)
+    limit.daily_min_loading         = data.get("daily_min_loading",         limit.daily_min_loading)
     limit.weekly_max_concentration  = data.get("weekly_max_concentration",  limit.weekly_max_concentration)
     limit.weekly_max_loading        = data.get("weekly_max_loading",        limit.weekly_max_loading)
     limit.monthly_avg_concentration = data.get("monthly_avg_concentration", limit.monthly_avg_concentration)
@@ -265,6 +277,7 @@ def update_limit(permit_id, limit_id):
     limit.sample_type               = data.get("sample_type",               limit.sample_type)
     limit.is_monitor_report         = bool(data.get("is_monitor_report",    limit.is_monitor_report))
     limit.daily_max_is_mr           = bool(data.get("daily_max_is_mr",      limit.daily_max_is_mr or False))
+    limit.daily_min_is_mr           = bool(data.get("daily_min_is_mr",      limit.daily_min_is_mr or False))
     limit.weekly_max_is_mr          = bool(data.get("weekly_max_is_mr",     limit.weekly_max_is_mr or False))
     limit.monthly_avg_is_mr         = bool(data.get("monthly_avg_is_mr",    limit.monthly_avg_is_mr or False))
     limit.is_range_limit            = bool(data.get("is_range_limit",        limit.is_range_limit))
@@ -280,6 +293,8 @@ def update_limit(permit_id, limit_id):
     stale_types = set()
     if old_daily_max_conc  is not None and (limit.daily_max_concentration  is None or limit.daily_max_is_mr):
         stale_types.add("max_exceeds")
+    if old_daily_min_conc  is not None and (limit.daily_min_concentration  is None or limit.daily_min_is_mr):
+        stale_types.add("below_min")
     if old_weekly_max_conc is not None and (limit.weekly_max_concentration is None or limit.weekly_max_is_mr):
         stale_types.add("weekly_avg_exceeds")
     if old_monthly_avg_conc is not None and (limit.monthly_avg_concentration is None or limit.monthly_avg_is_mr):
