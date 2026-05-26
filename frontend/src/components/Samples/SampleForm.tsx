@@ -404,9 +404,30 @@ export default function SampleForm({ companyId, companyName, onSubmitted }: Prop
                 limitHintText = <span style={s.limitHint}>Loading limit {limit.daily_max_loading} lbs/day</span>;
               }
 
+              // Loading calculation: concentration (mg/L) × flow (MGD) × conversion factor
+              const flowVal = sampleFlowMgd !== "" ? parseFloat(sampleFlowMgd) : null;
+              const param   = parameters.find(p => p.id === limit.parameter_id);
+              const cf      = param?.conversion_factor ?? 8.34;
+              const loading = (
+                val !== null && !isNaN(val) &&
+                flowVal !== null && !isNaN(flowVal) && flowVal > 0 &&
+                !limit.is_range_limit && !limit.is_monitor_report
+              ) ? val * flowVal * cf : null;
+
               return (
                 <div key={limit.id} style={s.paramCard}>
-                  <div style={s.paramName}>{limit.parameter_name}</div>
+                  <div style={s.paramNameRow}>
+                    <span style={s.paramName}>{limit.parameter_name}</span>
+                    {limit.sample_type && (
+                      <span style={
+                        limit.sample_type === "composite" ? s.badgeComposite
+                        : limit.sample_type === "grab"    ? s.badgeGrab
+                        : s.badgeSampleType
+                      }>
+                        {limit.sample_type}
+                      </span>
+                    )}
+                  </div>
                   {limitHintText && <div style={s.paramHint}>{limitHintText}</div>}
                   <div style={s.paramInputRow}>
                     <input
@@ -431,6 +452,17 @@ export default function SampleForm({ companyId, companyName, onSubmitted }: Prop
                     {status === "range_ok"   && <span style={s.badgePass}>✓ In Range</span>}
                     {status === "range_fail" && <span style={s.badgeFail}>✗ Out of Range</span>}
                   </div>
+                  {loading !== null && (
+                    <div style={s.loadingRow}>
+                      <span style={s.loadingLabel}>Loading:</span>
+                      <span style={s.loadingValue}>{loading.toFixed(2)} lbs/day</span>
+                      {limit.daily_max_loading != null && !limit.daily_max_loading_is_mr && (
+                        loading <= limit.daily_max_loading
+                          ? <span style={s.badgePass}>✓ Pass</span>
+                          : <span style={s.badgeFail}>✗ Exceeds</span>
+                      )}
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -544,4 +576,18 @@ const s: Record<string, React.CSSProperties> = {
   btn:            { padding:"10px 32px", background:"#2b6cb0", color:"#fff",
                     border:"none", borderRadius:6, fontSize:15, fontWeight:600,
                     cursor:"pointer", letterSpacing:"0.02em" },
+  paramNameRow:   { display:"flex", alignItems:"center", gap:6, marginBottom:2 },
+  badgeComposite: { fontSize:10, fontWeight:700, padding:"1px 6px", borderRadius:4,
+                    textTransform:"capitalize" as const, background:"#ebf8ff",
+                    color:"#2b6cb0", border:"1px solid #90cdf4" },
+  badgeGrab:      { fontSize:10, fontWeight:700, padding:"1px 6px", borderRadius:4,
+                    textTransform:"capitalize" as const, background:"#f0fff4",
+                    color:"#276749", border:"1px solid #9ae6b4" },
+  badgeSampleType:{ fontSize:10, fontWeight:700, padding:"1px 6px", borderRadius:4,
+                    textTransform:"capitalize" as const, background:"#f7fafc",
+                    color:"#718096", border:"1px solid #e2e8f0" },
+  loadingRow:     { display:"flex", alignItems:"center", gap:6, marginTop:2,
+                    paddingTop:4, borderTop:"1px solid #edf2f7" },
+  loadingLabel:   { fontSize:11, color:"#718096" },
+  loadingValue:   { fontSize:11, fontWeight:700, color:"#2b6cb0" },
 };
