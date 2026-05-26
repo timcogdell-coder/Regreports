@@ -556,6 +556,7 @@ def monthly_report_pdf():
         "Parameter", "Freq.", "Samples\nTaken",
         "Daily Max\nLimit (mg/L)", "Daily Max\nLimit (lbs/d)",
         "Daily Min\nLimit (mg/L)",
+        "Wkly Max\nLimit (mg/L)",
         "Mo. Avg\nLimit (mg/L)", "Mo. Avg\nLimit (lbs/d)",
         "Min\nMeasured", "Max\nMeasured",
         "Avg\nConc (mg/L)", "Avg\nLoad (lbs/d)",
@@ -594,9 +595,9 @@ def monthly_report_pdf():
                 exc_rows.add(i)
 
             # Limit columns — only show in the column matching averaging period
-            d_lim_c  = _fmt(pl.daily_max_concentration)   if ap == "daily_max"   else "—"
-            mo_lim_c = _fmt(pl.monthly_avg_concentration)  if ap == "monthly_avg" else "—"
-            wk_val   = _fmt(pl.weekly_max_concentration)   if ap == "weekly_max"  else None
+            d_lim_c  = _fmt(pl.daily_max_concentration)  if ap == "daily_max"   else "—"
+            wk_lim_c = _fmt(pl.weekly_max_concentration) if ap == "weekly_max"  else "—"
+            mo_lim_c = _fmt(pl.monthly_avg_concentration) if ap == "monthly_avg" else "—"
 
             fr_status = any_flow_report.review_status if any_flow_report else "missing"
             if fr_status == "reviewed":
@@ -609,15 +610,11 @@ def monthly_report_pdf():
                 sampled_cell = "No Report"
                 status_str   = "No Report"
 
-            # For weekly_max, show limit in the daily column (closest fit in the PDF layout)
-            if wk_val is not None:
-                d_lim_c = wk_val
-
             table_data.append([
                 Paragraph(f"{param.name if param else 'Unknown'} (MGD)", cell_s),
                 freq.frequency_code if freq else "—",
                 sampled_cell,
-                d_lim_c, "—", "—",
+                d_lim_c, "—", "—", wk_lim_c,
                 mo_lim_c, "—",
                 "—", "—",
                 _fmt(measured) if measured is not None else "—", "—",
@@ -655,16 +652,17 @@ def monthly_report_pdf():
             exc_rows.add(i)
 
         if pl.is_monitor_report:
-            d_lim_c, d_lim_l, d_min_c, mo_lim_c, mo_lim_l = "MR", "MR", "MR", "MR", "MR"
+            d_lim_c, d_lim_l, d_min_c, wk_max_c, mo_lim_c, mo_lim_l = "MR", "MR", "MR", "MR", "MR", "MR"
         elif pl.is_range_limit:
             mn = pl.min_value if pl.min_value is not None else "—"
             mx = pl.max_value if pl.max_value is not None else "—"
             d_lim_c = f"{mn}–{mx}"
-            d_lim_l, d_min_c, mo_lim_c, mo_lim_l = "—", "—", "—", "—"
+            d_lim_l, d_min_c, wk_max_c, mo_lim_c, mo_lim_l = "—", "—", "—", "—", "—"
         else:
             d_lim_c  = _fmt(pl.daily_max_concentration)
             d_lim_l  = _fmt(pl.daily_max_loading)
-            d_min_c  = "MR" if pl.daily_min_is_mr else _fmt(pl.daily_min_concentration)
+            d_min_c  = "MR" if pl.daily_min_is_mr  else _fmt(pl.daily_min_concentration)
+            wk_max_c = "MR" if pl.weekly_max_is_mr else _fmt(pl.weekly_max_concentration)
             mo_lim_c = _fmt(pl.monthly_avg_concentration)
             mo_lim_l = _fmt(pl.monthly_avg_loading)
 
@@ -674,7 +672,7 @@ def monthly_report_pdf():
             Paragraph(param.name if param else "Unknown", cell_s),
             freq.frequency_code if freq else "—",
             str(n),
-            d_lim_c, d_lim_l, d_min_c,
+            d_lim_c, d_lim_l, d_min_c, wk_max_c,
             mo_lim_c, mo_lim_l,
             _fmt(min(conc_vals)) if conc_vals else "—",
             _fmt(max(conc_vals)) if conc_vals else "—",
@@ -683,11 +681,11 @@ def monthly_report_pdf():
             status,
         ])
 
-    col_widths_pdf = [1.3*inch, 0.45*inch, 0.5*inch,
-                      0.78*inch, 0.72*inch, 0.72*inch,
-                      0.78*inch, 0.72*inch,
-                      0.65*inch, 0.65*inch, 0.72*inch, 0.72*inch,
-                      0.6*inch, 0.79*inch]
+    col_widths_pdf = [1.2*inch, 0.42*inch, 0.48*inch,
+                      0.70*inch, 0.68*inch, 0.68*inch, 0.68*inch,
+                      0.70*inch, 0.68*inch,
+                      0.60*inch, 0.60*inch, 0.68*inch, 0.68*inch,
+                      0.52*inch, 0.70*inch]
 
     tbl = Table(table_data, colWidths=col_widths_pdf, repeatRows=1)
     style_cmds = [

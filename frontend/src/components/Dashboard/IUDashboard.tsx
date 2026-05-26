@@ -448,6 +448,7 @@ export default function IUDashboard({ user, onLogout, initialTab }: Props) {
                     <th style={s.th}>Sample Type</th>
                     <th style={s.th}>Daily Min</th>
                     <th style={s.th}>Daily Max</th>
+                    <th style={s.th}>Weekly Max</th>
                     <th style={s.th}>Monthly Avg</th>
                     <th style={s.th}>Frequency</th>
                     <th style={s.th}>Notes</th>
@@ -475,6 +476,15 @@ export default function IUDashboard({ user, onLogout, initialTab }: Props) {
                               : l.daily_max_loading != null
                                 ? `${l.daily_max_loading} lbs/day`
                                 : "—"}
+                      </td>
+                      <td style={s.td}>
+                        {l.is_monitor_report || l.is_range_limit || l.is_flow_limit ? "—"
+                          : l.weekly_max_is_mr ? <span style={s.mrBadge}>MR</span>
+                          : l.weekly_max_concentration != null
+                            ? `${l.weekly_max_concentration} mg/L`
+                            : l.weekly_max_loading != null
+                              ? `${l.weekly_max_loading} lbs/day`
+                              : "—"}
                       </td>
                       <td style={s.td}>
                         {l.monthly_avg_concentration != null
