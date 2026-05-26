@@ -149,6 +149,24 @@ def _migrate_columns():
             conn.rollback()
 
 
+def _upsert_frequency(code: str, description: str):
+    """Add frequency if it doesn't exist; update any placeholder row that uses N/A-* codes."""
+    from models import Frequency
+    existing = Frequency.query.filter_by(frequency_code=code).first()
+    if existing:
+        return
+    # Replace a placeholder row (N/A-*) if one exists; otherwise insert fresh.
+    placeholder = Frequency.query.filter(
+        Frequency.description.like("[placeholder%")
+    ).first()
+    if placeholder:
+        placeholder.frequency_code = code
+        placeholder.description    = description
+    else:
+        db.session.add(Frequency(frequency_code=code, description=description))
+    db.session.commit()
+
+
 def _seed_reference_data():
     """Populate lookup tables if empty."""
     from models import Parameter, Frequency, LimitType
@@ -182,6 +200,9 @@ def _seed_reference_data():
         db.session.add_all(types)
 
     db.session.commit()
+
+    # Update placeholder frequency entries to real values.
+    _upsert_frequency("1/14", "Once every two weeks")
 
     # Ensure Plant Flow parameters exist (conversion_factor=0 suppresses loading calc).
     # Rename any legacy "Flow" or "Plant Flow" parameter to "Plant Flow (Max)".

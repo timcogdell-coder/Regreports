@@ -1755,7 +1755,7 @@ export default function AdminDashboard({ user, onLogout }: Props) {
                     <div style={{flex:"1 1 0", minWidth:0}}>
                       {selectedPermitLimits.length === 0
                         ? <p style={s.meta}>No limits set yet — add one on the left.</p>
-                        : <div style={{overflowX:"auto"}}>
+                        : <div style={{overflowX:"auto", overflowY:"auto", maxHeight:"70vh"}}>
                             <table style={s.table}>
                               <thead><tr>
                                 <th style={s.th}>Parameter</th>
