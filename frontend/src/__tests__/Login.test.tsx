@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import Login from "../components/Login";
@@ -85,7 +85,7 @@ describe("Login", () => {
     expect(submit).toBeDisabled();
     expect(submit).toHaveTextContent("Signing in…");
 
-    resolve!({ data: { user: { id: 1, username: "Tim", role: "admin" } } });
+    await act(async () => { resolve!({ data: { user: { id: 1, username: "Tim", role: "admin" } } }); });
   });
 
   test("clears error on a new submit attempt", async () => {

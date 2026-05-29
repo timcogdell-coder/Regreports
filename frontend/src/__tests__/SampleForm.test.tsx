@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, waitFor, within, fireEvent } from "@testing-library/react";
+import { render, screen, waitFor, within, fireEvent, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import SampleForm from "../components/Samples/SampleForm";
@@ -320,6 +320,7 @@ describe("SampleForm — submission", () => {
         expect.objectContaining({ permit_limit_id: 10, concentration: 250 }),
       ])
     );
+    await waitFor(() => expect(screen.getByRole("button", { name: /submit sample data/i })).toBeEnabled());
   });
 
   test("shows success message when no violations detected", async () => {
@@ -330,6 +331,7 @@ describe("SampleForm — submission", () => {
     await user.type(container.querySelector('input[type="date"]') as HTMLInputElement, "2026-05-15");
     await user.click(screen.getByRole("button", { name: /submit sample data/i }));
     await waitFor(() => screen.getByText(/no violations detected/i));
+    await waitFor(() => expect(screen.getByRole("button", { name: /submit sample data/i })).toBeEnabled());
   });
 
   test("shows violation count message when violations are detected", async () => {
@@ -342,6 +344,7 @@ describe("SampleForm — submission", () => {
     await user.type(container.querySelector('input[type="date"]') as HTMLInputElement, "2026-05-15");
     await user.click(screen.getByRole("button", { name: /submit sample data/i }));
     await waitFor(() => screen.getByText(/2 violation\(s\) detected/i));
+    await waitFor(() => expect(screen.getByRole("button", { name: /submit sample data/i })).toBeEnabled());
   });
 
   test("shows error message on submission failure", async () => {
@@ -352,6 +355,7 @@ describe("SampleForm — submission", () => {
     await user.type(container.querySelector('input[type="date"]') as HTMLInputElement, "2026-05-15");
     await user.click(screen.getByRole("button", { name: /submit sample data/i }));
     await waitFor(() => screen.getByText(/submission failed/i));
+    await waitFor(() => expect(screen.getByRole("button", { name: /submit sample data/i })).toBeEnabled());
   });
 
   test("resets results in localStorage after successful submission", async () => {
@@ -364,6 +368,7 @@ describe("SampleForm — submission", () => {
     await user.type(container.querySelector('input[type="date"]') as HTMLInputElement, "2026-05-15");
     await user.click(screen.getByRole("button", { name: /submit sample data/i }));
     await waitFor(() => screen.getByText(/no violations detected/i));
+    await waitFor(() => expect(screen.getByRole("button", { name: /submit sample data/i })).toBeEnabled());
     // Auto-save fires after setResults({}), so results should be empty in the saved draft
     const saved = JSON.parse(localStorage.getItem(DRAFT_KEY) || "{}");
     expect(saved.results).toEqual({});
@@ -380,7 +385,7 @@ describe("SampleForm — submission", () => {
     await waitFor(() =>
       expect(screen.getByRole("button", { name: /submitting/i })).toBeDisabled()
     );
-    resolve!({ data: { violations: [] } });
+    await act(async () => { resolve!({ data: { violations: [] } }); });
   });
 
   test("empty result inputs are excluded from payload", async () => {
@@ -394,5 +399,6 @@ describe("SampleForm — submission", () => {
     await waitFor(() => expect(mocks.submitSample).toHaveBeenCalled());
     const payload = mocks.submitSample.mock.calls[0][0] as any;
     expect(payload.results).toHaveLength(0);
+    await waitFor(() => expect(screen.getByRole("button", { name: /submit sample data/i })).toBeEnabled());
   });
 });

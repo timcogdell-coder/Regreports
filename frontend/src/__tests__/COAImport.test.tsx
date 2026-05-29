@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import COAImport from "../components/COAImport";
@@ -103,7 +103,7 @@ describe("COAImport — file selection", () => {
       expect(screen.getByText("Parsing PDF…")).toBeInTheDocument()
     );
 
-    resolve!({ data: PREVIEW });
+    await act(async () => { resolve!({ data: PREVIEW }); });
   });
 
   test("calls parseCOA with companyId and selected file", async () => {

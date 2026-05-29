@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import MonthlyFlowForm from "../components/Samples/MonthlyFlowForm";
@@ -33,9 +33,10 @@ function renderForm(companyId = 7) {
 describe("MonthlyFlowForm — initial state", () => {
   beforeEach(() => jest.clearAllMocks());
 
-  test("shows heading and method tabs", () => {
+  test("shows heading and method tabs", async () => {
     mocks.getLastEndReading.mockResolvedValue({ data: null } as any);
     renderForm();
+    await act(async () => {});
     expect(screen.getByRole("heading", { name: /monthly flow report/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /meter totalizer/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /time-volume/i })).toBeInTheDocument();
@@ -50,9 +51,10 @@ describe("MonthlyFlowForm — initial state", () => {
     expect(screen.getByPlaceholderText(/totalizer at month end/i)).toBeInTheDocument();
   });
 
-  test("submit button is disabled when no readings entered", () => {
+  test("submit button is disabled when no readings entered", async () => {
     mocks.getLastEndReading.mockResolvedValue({ data: null } as any);
     renderForm();
+    await act(async () => {});
     expect(screen.getByRole("button", { name: /submit flow report/i })).toBeDisabled();
   });
 
@@ -62,9 +64,10 @@ describe("MonthlyFlowForm — initial state", () => {
     await waitFor(() => expect(mocks.getLastEndReading).toHaveBeenCalledWith(42));
   });
 
-  test("shows days in the default reporting period", () => {
+  test("shows days in the default reporting period", async () => {
     mocks.getLastEndReading.mockResolvedValue({ data: null } as any);
     renderForm();
+    await act(async () => {});
     expect(screen.getByText("30 days")).toBeInTheDocument();
   });
 });
@@ -294,6 +297,8 @@ describe("MonthlyFlowForm — submission", () => {
     fireEvent.change(screen.getByPlaceholderText(/totalizer at month start/i), { target: { value: "0" } });
     fireEvent.change(screen.getByPlaceholderText(/totalizer at month end/i),   { target: { value: endRead } });
     await user.click(screen.getByRole("button", { name: /submit flow report/i }));
+    // Wait for setSubmitting(false) in the finally block — button text returns from "Submitting…".
+    await waitFor(() => screen.getByRole("button", { name: /submit flow report/i }));
     return { onSubmitted };
   }
 
@@ -368,7 +373,7 @@ describe("MonthlyFlowForm — submission", () => {
     fireEvent.change(screen.getByPlaceholderText(/totalizer at month end/i),   { target: { value: "1000000" } });
     await user.click(screen.getByRole("button", { name: /submit flow report/i }));
     expect(screen.getByRole("button", { name: /submitting/i })).toBeDisabled();
-    resolve!({ data: { violations: [] } });
+    await act(async () => { resolve!({ data: { violations: [] } }); });
   });
 
   test("advances beginning read to end read value after meter submit", async () => {
