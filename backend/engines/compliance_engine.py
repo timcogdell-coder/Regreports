@@ -43,6 +43,7 @@ def check_compliance(sample: Sample) -> list:
         v = _check_result(sample, result, limit)
         violations.extend(v)
 
+    db.session.commit()
     return violations
 
 
@@ -177,7 +178,7 @@ def _clear_monthly_avg_violations(sample: Sample, limit: PermitLimit) -> None:
             EnforcementHistory.violation_id.in_(vids)
         ).delete(synchronize_session=False)
         Violation.query.filter(Violation.id.in_(vids)).delete(synchronize_session=False)
-        db.session.commit()
+        db.session.flush()
 
 
 def _clear_weekly_violations(sample: Sample, limit: PermitLimit) -> None:
@@ -200,7 +201,7 @@ def _clear_weekly_violations(sample: Sample, limit: PermitLimit) -> None:
             EnforcementHistory.violation_id.in_(vids)
         ).delete(synchronize_session=False)
         Violation.query.filter(Violation.id.in_(vids)).delete(synchronize_session=False)
-        db.session.commit()
+        db.session.flush()
 
 
 def _get_weekly_avg_concentration(sample: Sample, limit: PermitLimit) -> float | None:
@@ -389,7 +390,6 @@ def _create_violation(sample, limit, result, violation_type, exceedance_pct, *, 
         exceedance_percent  = exceedance_pct,
     )
     db.session.add(v)
-    db.session.commit()
     return v
 
 

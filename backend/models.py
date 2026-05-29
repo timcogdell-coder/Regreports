@@ -316,7 +316,7 @@ class Violation(db.Model):
     exceedance_percent  = db.Column(db.Float)
     created_at          = db.Column(db.DateTime, default=datetime.utcnow)
 
-    parameter   = db.relationship("Parameter", lazy=True)
+    parameter   = db.relationship("Parameter", lazy="joined")
     enforcement = db.relationship("EnforcementHistory", backref="violation", lazy=True)
 
     def to_dict(self):
@@ -346,9 +346,11 @@ class EnforcementHistory(db.Model):
     sent_at                 = db.Column(db.DateTime)
     created_at              = db.Column(db.DateTime, default=datetime.utcnow)
 
+    company = db.relationship("Company", foreign_keys=[company_id], lazy="joined")
+
     def to_dict(self):
         v = self.violation
-        company = Company.query.get(self.company_id) if self.company_id else None
+        company = self.company
         return {
             "id":                       self.id,
             "company_id":               self.company_id,

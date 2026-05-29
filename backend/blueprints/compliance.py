@@ -365,6 +365,7 @@ def recalculate_compliance():
 
 @compliance_bp.route("/violations", methods=["GET"])
 @login_required
+@roles_required("admin", "coordinator", "iu")
 def list_violations():
     company_id = request.args.get("company_id", type=int)
     if current_user.role == "iu":
@@ -573,6 +574,7 @@ def snc_report():
 
 @compliance_bp.route("/violations/<int:company_id>/history", methods=["GET"])
 @login_required
+@roles_required("admin", "coordinator", "iu")
 def violation_history(company_id):
     if current_user.role == "iu" and current_user.company_id != company_id:
         return jsonify({"error": "Not authorised"}), 403

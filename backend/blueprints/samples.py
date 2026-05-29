@@ -373,10 +373,12 @@ def add_sample_result(sample_id):
     if not permit_limit_id:
         return jsonify({"error": "permit_limit_id required"}), 400
 
+    permit_limit = PermitLimit.query.get(permit_limit_id)
+    if not permit_limit or permit_limit.permit_id != sample.permit_id:
+        return jsonify({"error": "Invalid permit_limit_id"}), 400
+
     if SampleResult.query.filter_by(sample_id=sample_id, permit_limit_id=permit_limit_id).first():
         return jsonify({"error": "A result for this parameter already exists"}), 409
-
-    permit_limit = PermitLimit.query.get(permit_limit_id)
 
     loading = None
     cf = permit_limit.parameter.conversion_factor if permit_limit and permit_limit.parameter else None
