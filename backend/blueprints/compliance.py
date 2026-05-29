@@ -367,6 +367,8 @@ def recalculate_compliance():
 @login_required
 def list_violations():
     company_id = request.args.get("company_id", type=int)
+    if current_user.role == "iu":
+        company_id = current_user.company_id
     query = Violation.query
     if company_id:
         query = query.filter_by(company_id=company_id)
@@ -572,6 +574,8 @@ def snc_report():
 @compliance_bp.route("/violations/<int:company_id>/history", methods=["GET"])
 @login_required
 def violation_history(company_id):
+    if current_user.role == "iu" and current_user.company_id != company_id:
+        return jsonify({"error": "Not authorised"}), 403
     from datetime import date, timedelta
     cutoff = date.today() - timedelta(days=365)
     violations = (Violation.query

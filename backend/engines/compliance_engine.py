@@ -114,30 +114,39 @@ def _check_result(sample: Sample, result: SampleResult, limit: PermitLimit) -> l
                 violations.append(_create_violation(sample, limit, result, "below_min", pct))
 
     # Weekly max — period-level violations (sample_id NULL so they don't migrate between samples).
-    if not (limit.weekly_max_concentration_is_mr or False) and conc is not None and limit.weekly_max_concentration is not None:
+    # Clear once before both sub-checks so a concentration violation isn't wiped by the
+    # loading clear that used to follow it.
+    has_weekly_conc  = not (limit.weekly_max_concentration_is_mr or False) and conc    is not None and limit.weekly_max_concentration is not None
+    has_weekly_load  = not (limit.weekly_max_loading_is_mr    or False) and loading is not None and limit.weekly_max_loading    is not None
+    if has_weekly_conc or has_weekly_load:
         _clear_weekly_violations(sample, limit)
+
+    if has_weekly_conc:
         week_avg = _get_weekly_avg_concentration(sample, limit)
         if week_avg is not None and week_avg > limit.weekly_max_concentration:
             pct = _exceedance_pct(week_avg, limit.weekly_max_concentration)
             violations.append(_create_violation(sample, limit, result, "weekly_avg_exceeds", pct, link_to_sample=False))
 
-    if not (limit.weekly_max_loading_is_mr or False) and loading is not None and limit.weekly_max_loading is not None:
-        _clear_weekly_violations(sample, limit)
+    if has_weekly_load:
         week_avg_load = _get_weekly_avg_loading(sample, limit)
         if week_avg_load is not None and week_avg_load > limit.weekly_max_loading:
             pct = _exceedance_pct(week_avg_load, limit.weekly_max_loading)
             violations.append(_create_violation(sample, limit, result, "weekly_avg_exceeds", pct, link_to_sample=False))
 
     # Monthly avg — sweep-and-re-evaluate so a corrective sample resolves a prior violation.
-    if not (limit.monthly_avg_concentration_is_mr or False) and conc is not None and limit.monthly_avg_concentration is not None:
+    # Clear once before both sub-checks for the same reason as the weekly block above.
+    has_monthly_conc = not (limit.monthly_avg_concentration_is_mr or False) and conc    is not None and limit.monthly_avg_concentration is not None
+    has_monthly_load = not (limit.monthly_avg_loading_is_mr    or False) and loading is not None and limit.monthly_avg_loading    is not None
+    if has_monthly_conc or has_monthly_load:
         _clear_monthly_avg_violations(sample, limit)
+
+    if has_monthly_conc:
         avg = _get_monthly_avg_concentration(sample, limit)
         if avg is not None and avg > limit.monthly_avg_concentration:
             pct = _exceedance_pct(avg, limit.monthly_avg_concentration)
             violations.append(_create_violation(sample, limit, result, "avg_exceeds", pct, link_to_sample=False))
 
-    if not (limit.monthly_avg_loading_is_mr or False) and loading is not None and limit.monthly_avg_loading is not None:
-        _clear_monthly_avg_violations(sample, limit)
+    if has_monthly_load:
         avg_load = _get_monthly_avg_loading(sample, limit)
         if avg_load is not None and avg_load > limit.monthly_avg_loading:
             pct = _exceedance_pct(avg_load, limit.monthly_avg_loading)

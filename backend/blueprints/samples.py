@@ -23,6 +23,17 @@ def submit_sample():
     if not company_id:
         return jsonify({"error": "company_id required"}), 400
 
+    # Verify permit belongs to this company
+    permit = Permit.query.get(data.get("permit_id"))
+    if not permit or permit.company_id != company_id:
+        return jsonify({"error": "Invalid permit_id"}), 400
+
+    # Verify every submitted permit_limit belongs to this permit
+    for r in data.get("results", []):
+        pl = PermitLimit.query.get(r.get("permit_limit_id"))
+        if not pl or pl.permit_id != permit.id:
+            return jsonify({"error": "Invalid permit_limit_id"}), 400
+
     # Derive period info from sample date
     sample_date_obj = datetime.strptime(data["sample_date"], "%Y-%m-%d").date()
     report_month  = sample_date_obj.month
@@ -115,7 +126,9 @@ def list_samples():
 @samples_bp.route("/<int:sample_id>", methods=["GET"])
 @login_required
 def get_sample(sample_id):
-    sample  = Sample.query.get_or_404(sample_id)
+    sample = Sample.query.get_or_404(sample_id)
+    if current_user.role == "iu" and sample.company_id != current_user.company_id:
+        return jsonify({"error": "Not authorised"}), 403
     company = Company.query.get(sample.company_id)
     permit  = Permit.query.get(sample.permit_id)
 

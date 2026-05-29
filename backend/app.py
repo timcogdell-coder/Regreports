@@ -25,7 +25,7 @@ def create_app(env=None):
     app.config.from_object(config[env])
 
     db.init_app(app)
-    CORS(app, supports_credentials=True)
+    CORS(app, supports_credentials=True, origins=app.config["ALLOWED_ORIGINS"])
 
     login_manager = LoginManager()
     login_manager.init_app(app)

@@ -53,7 +53,7 @@ def calculate_monthly_surcharge(company_id: int, month: int, year: int) -> dict:
     # ── Step 2: Average BOD and TSS concentrations from samples this month ────
     samples = (
         Sample.query
-        .filter_by(company_id=company_id)
+        .filter_by(company_id=company_id, review_status="reviewed")
         .filter(
             db.extract("month", Sample.sample_date) == month,
             db.extract("year",  Sample.sample_date) == year,

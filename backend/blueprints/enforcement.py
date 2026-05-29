@@ -81,6 +81,8 @@ def override_action(action_id):
 @enforcement_bp.route("/history/<int:company_id>", methods=["GET"])
 @login_required
 def enforcement_history(company_id):
+    if current_user.role == "iu" and current_user.company_id != company_id:
+        return jsonify({"error": "Not authorised"}), 403
     actions = (EnforcementHistory.query
                .filter_by(company_id=company_id)
                .order_by(EnforcementHistory.created_at.desc())

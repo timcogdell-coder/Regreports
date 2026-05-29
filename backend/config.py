@@ -6,6 +6,8 @@ load_dotenv()
 
 class Config:
     SECRET_KEY          = os.environ.get("SECRET_KEY", "dev-secret-change-in-production")
+    # Set CORS_ORIGIN in production to the deployed frontend URL (comma-separated for multiple).
+    ALLOWED_ORIGINS     = [o.strip() for o in os.environ.get("CORS_ORIGIN", "http://localhost:3000").split(",") if o.strip()]
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", "postgresql://localhost/regreports_dev")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_EXPIRATION_HOURS = 8
