@@ -29,6 +29,8 @@ def calculate():
 def list_surcharges():
     company_id = request.args.get("company_id", type=int)
     if current_user.role == "iu":
+        if not current_user.company_id:
+            return jsonify({"error": "No company assigned to this account"}), 400
         company_id = current_user.company_id
     query = SurchargeCalculation.query
     if company_id:

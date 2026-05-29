@@ -122,9 +122,17 @@ def parse_coa():
 
     pdf_file = request.files["file"]
 
+    if os.path.splitext(pdf_file.filename)[1].lower() != ".pdf":
+        return jsonify({"error": "Uploaded file must be a PDF"}), 400
+
+    # Verify PDF magic bytes before writing to disk
+    header = pdf_file.read(5)
+    pdf_file.seek(0)
+    if header != b"%PDF-":
+        return jsonify({"error": "Uploaded file does not appear to be a valid PDF"}), 400
+
     # Write to temp file — pdfplumber needs a real path
-    suffix = os.path.splitext(pdf_file.filename)[1] or ".pdf"
-    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
         pdf_file.save(tmp)
         tmp_path = tmp.name
 

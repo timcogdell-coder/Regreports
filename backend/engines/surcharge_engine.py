@@ -64,10 +64,11 @@ def calculate_monthly_surcharge(company_id: int, month: int, year: int) -> dict:
     if not samples:
         return _zero_result(company_id, month, year, days_in_month, flow_report_status="reviewed")
 
-    # ── Step 2: Collect concentrations per parameter abbreviation ─────────────
-    bod_concs   = []
-    tss_concs   = []
-    color_concs = []
+    # ── Step 2: Collect (concentration, sample_flow_mgd) per parameter ────────
+    # Stored as tuples so Step 3 can compute a flow-weighted average.
+    bod_data:   list[tuple[float, float | None]] = []
+    tss_data:   list[tuple[float, float | None]] = []
+    color_data: list[tuple[float, float | None]] = []
 
     for sample in samples:
         for result in sample.results:
@@ -78,11 +79,11 @@ def calculate_monthly_surcharge(company_id: int, month: int, year: int) -> dict:
                 continue
             abbrev = (limit.parameter.abbreviation or "").upper()
             if abbrev == "BOD":
-                bod_concs.append(result.concentration_result)
+                bod_data.append((result.concentration_result, sample.flow_mgd))
             elif abbrev == "TSS":
-                tss_concs.append(result.concentration_result)
+                tss_data.append((result.concentration_result, sample.flow_mgd))
             elif abbrev == "COLOR":
-                color_concs.append(result.concentration_result)
+                color_data.append((result.concentration_result, sample.flow_mgd))
 
     # ── Step 3: Compute charges ───────────────────────────────────────────────
     bod_threshold   = current_app.config["BOD_THRESHOLD"]
@@ -92,24 +93,30 @@ def calculate_monthly_surcharge(company_id: int, month: int, year: int) -> dict:
     tss_rate        = current_app.config["TSS_RATE"]
     color_rate      = current_app.config["COLOR_RATE"]
 
-    def _calc(concs: list, threshold: float, rate: float, cf: float = 8.34):
+    def _calc(data: list[tuple[float, float | None]], threshold: float, rate: float, cf: float = 8.34):
         """
         Returns (avg_conc, excess_conc, monthly_lbs, charge).
+        Uses a flow-weighted average concentration when sample flow data is available;
+        falls back to arithmetic mean when no samples carry a flow value.
         excess_conc and charge are negative when concentration is below threshold (credit).
         monthly_lbs = excess_conc × total_flow_mg × 8.34
-                    = excess_conc × avg_daily_mg × 8.34 × days_in_month  (equivalent)
         """
-        if not concs:
+        if not data:
             return None, 0.0, 0.0, 0.0
-        avg_conc    = sum(concs) / len(concs)
+        weighted = [(c, f) for c, f in data if f is not None and f > 0]
+        if weighted:
+            flow_sum = sum(f for _, f in weighted)
+            avg_conc = sum(c * f for c, f in weighted) / flow_sum
+        else:
+            avg_conc = sum(c for c, _ in data) / len(data)
         excess_conc = avg_conc - threshold          # negative = below threshold = credit
         monthly_lbs = excess_conc * total_flow_mg * cf
         charge      = (monthly_lbs / 1_000) * rate
         return round(avg_conc, 4), round(excess_conc, 4), round(monthly_lbs, 2), round(charge, 2)
 
-    bod_avg,   bod_excess_conc,   bod_lbs,   bod_charge   = _calc(bod_concs,   bod_threshold,   bod_rate)
-    tss_avg,   tss_excess_conc,   tss_lbs,   tss_charge   = _calc(tss_concs,   tss_threshold,   tss_rate)
-    color_avg, color_excess_conc, color_lbs, color_charge = _calc(color_concs, color_threshold, color_rate)
+    bod_avg,   bod_excess_conc,   bod_lbs,   bod_charge   = _calc(bod_data,   bod_threshold,   bod_rate)
+    tss_avg,   tss_excess_conc,   tss_lbs,   tss_charge   = _calc(tss_data,   tss_threshold,   tss_rate)
+    color_avg, color_excess_conc, color_lbs, color_charge = _calc(color_data, color_threshold, color_rate)
 
     total_charge = round(bod_charge + tss_charge + color_charge, 2)
 

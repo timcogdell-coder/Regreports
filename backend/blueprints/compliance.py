@@ -22,6 +22,7 @@ def _parse_interval(frequency_code: str):
 
 @compliance_bp.route("/schedule", methods=["GET"])
 @login_required
+@roles_required("admin", "coordinator", "iu")
 def sampling_schedule():
     company_id = request.args.get("company_id", type=int)
     if current_user.role == "iu":

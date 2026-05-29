@@ -115,6 +115,8 @@ def submit_sample():
 def list_samples():
     company_id = request.args.get("company_id", type=int)
     if current_user.role == "iu":
+        if not current_user.company_id:
+            return jsonify({"error": "No company assigned to this account"}), 400
         company_id = current_user.company_id
     query = Sample.query
     if company_id:

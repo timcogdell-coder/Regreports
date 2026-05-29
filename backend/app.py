@@ -46,6 +46,11 @@ def create_app(env=None):
     app.register_blueprint(flow_reports_bp, url_prefix="/api/flow-reports")
     app.register_blueprint(erg_config_bp,  url_prefix="/api/erg-config")
 
+    if env == "production" and app.config["SECRET_KEY"] == "dev-secret-change-in-production":
+        raise RuntimeError(
+            "SECRET_KEY must be set via the SECRET_KEY environment variable in production."
+        )
+
     with app.app_context():
         db.create_all()
         _migrate_columns()

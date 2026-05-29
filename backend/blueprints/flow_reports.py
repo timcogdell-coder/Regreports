@@ -15,6 +15,8 @@ flow_reports_bp = Blueprint("flow_reports", __name__)
 def list_flow_reports():
     company_id = request.args.get("company_id", type=int)
     if current_user.role == "iu":
+        if not current_user.company_id:
+            return jsonify({"error": "No company assigned to this account"}), 400
         company_id = current_user.company_id
     q = MonthlyFlowReport.query
     if company_id:
